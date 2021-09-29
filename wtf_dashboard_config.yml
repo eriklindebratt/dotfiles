@@ -1,0 +1,134 @@
+wtf:
+  colors:
+    border:
+      focusable: darkslateblue
+      focused: orange
+      normal: gray
+  grid:
+    columns: [32, 32, 32, 32]
+    rows: [9, 8, 6, 8, 6, 90]
+  refreshInterval: 1
+  mods:
+    public_ip:
+      type: ipinfo
+      enabled: true
+      colors:
+        name: lightblue
+        value: white
+      position:
+        top: 0
+        left: 0
+        height: 1
+        width: 2
+      refreshInterval: 150
+      title: Public IP
+    local_ip:
+      type: cmdrunner
+      enabled: true
+      cmd: node
+      args: ["-e", "const {execSync} = require('child_process'); try {const interfaces = execSync('ifconfig').toString().match(/^([\\S\\d])+: /gm).map(i => i.replace(': ', '')); const formatted = interfaces.map(i => {let ip; try {ip = execSync('ipconfig getifaddr ' + i).toString().trim()} catch (e) {return ''} return '\\x1b[1m' + i + '\\x1b[0m\\n' + ip}).filter(i => !!i).join('\\n\\n'); console.log(formatted)} catch (e) {console.error('Failed to get local IP(s):', e); process.exit(1)}"]
+      position:
+        top: 0
+        left: 2
+        height: 1
+        width: 1
+      refreshInterval: 60
+      focusable: false
+      title: Local IP(s)
+    power:
+      enabled: true
+      position:
+        top: 0
+        left: 3
+        height: 1
+        width: 1
+      refreshInterval: 15
+      title: ⚡️
+    self_care:
+      type: cmdrunner
+      enabled: true
+      cmd: node
+      args: ["-e", "const Crawler = require('crawler'); const c = new Crawler({ callback: (err, res) => { const items = res['\\$']('.tweet:not(.user-pinned) .js-tweet-text.tweet-text'); const randomItem = items.eq(Math.round(Math.random() * items.length - 1)).text(); console.log(require('child_process').execSync('echo \"'+randomItem+'\" | fold -s -w32').toString()); } }); c.queue({ url: 'https://twitter.com/everydaycarebot' })"]
+      position:
+        top: 0
+        left: 4
+        width: 1
+        height: 1
+      refreshInterval: 600
+      focusable: false
+      title: "❤️ "
+    digitalclock:
+      enabled: true
+      color: gray
+      font: bigfont
+      position:
+        left: 5
+        top: 0
+        width: 1
+        height: 1
+      refreshInterval: 60
+      title: 🕒
+    prettyweather:
+      enabled: true
+      city: Stockholm
+      position:
+        top: 1
+        left: 3
+        height: 2
+        width: 1
+      refreshInterval: 1800
+      unit: m
+      view: 0
+      language: en
+      title: Weather
+    spotify:
+      enabled: false
+      colors:
+        label: green
+        text: white
+      position:
+        top: 1
+        left: 4
+        width: 2
+        height: 1
+      refreshInterval: 1
+    git:
+      enabled: true
+      commitCount: 5
+      commitFormat: "[forestgreen]%h [grey]%cd [white]%s [grey]%an[white]"
+      dateFormat: "%H:%M %d %b %y"
+      repositories:
+      - /Users/erik/dev/dotfiles
+      position:
+        top: 1
+        left: 0
+        height: 2
+        width: 3
+      refreshInterval: 3
+    swedish_news:
+      type: feedreader
+      enabled: true
+      feeds:
+      - http://svt.se/nyheter/rss.xml
+      - https://www.svt.se/nyheter/lokalt/stockholm/rss.xml
+      feedLimit: 20
+      position:
+        top: 1
+        left: 4
+        width: 2
+        height: 1
+      refreshInterval: 300
+      title: SVT
+    hacker_news:
+      type: feedreader
+      enabled: true
+      feeds:
+      - https://news.ycombinator.com/rss
+      feedLimit: 40
+      position:
+        top: 2
+        left: 4
+        width: 2
+        height: 2
+      refreshInterval: 1800
+      title: Hacker News

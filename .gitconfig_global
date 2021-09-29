@@ -1,0 +1,31 @@
+[alias]
+  log = log --decorate=full --color
+  s = status -sb
+  l = log --decorate=full --color --graph
+  unstage = reset
+  b = branch
+  co = checkout
+  out = log --decorate=full --color --graph origin/main..HEAD
+  g = grep -ni
+  find = grep -ni
+  showfiles = show --name-only
+[core]
+  excludesfile = ~/.gitignore
+  quotepath = false
+  editor = nvim -f
+[color]
+  branch = auto
+  diff = auto
+  interactive = auto
+  status = auto
+  ui = 1
+[push]
+  default = current
+[pull]
+  default = current
+[filter "media"]
+  clean = git-media-clean %f
+  smudge = git-media-smudge %f
+[merge]
+  tool = opendiff
+[user]

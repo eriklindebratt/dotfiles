@@ -1,0 +1,558 @@
+#!/usr/bin/env bash
+
+##
+# ./bootstrap
+# - Installs and configures up a local development environment on macOS.
+##
+
+set -e
+
+# ensure we include Homebrew and its installed binaries in $PATH, if installed
+HOMEBREW_PATH=/usr/local/bin
+CURRENT_PATH=$PATH
+if [[ :$CURRENT_PATH: != *:"$HOMEBREW_PATH":* ]]; then
+  PATH=$CURRENT_PATH:$HOMEBREW_PATH
+fi
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" >/dev/null 2>&1; pwd -P)"
+CONFIG_DIR="$HOME/.config"
+NEOVIM_CONFIG_DIR="$CONFIG_DIR/nvim"
+COLOR_SCHEMES_DIR="$CONFIG_DIR/color-schemes"
+WTF_CONFIG_PATH="$CONFIG_DIR/wtf/config.yml"
+
+STYLE_RESET=$(printf '\e[0m')
+STYLE_BOLD=$(printf '\e[1m')
+STYLE_HEADER=$(printf '\e[1;97m')
+STYLE_SUBHEADER=$(printf '\e[1;36m')
+STYLE_PARAGRAPH=$(printf '\e[2m')
+STYLE_PARAGRAPH_INDENT="  "
+STYLE_CLEAR_PREVIOUS_LINE="$(printf '\e[1A\e[2K')"
+
+ARG_CMD_RECEIVED=""
+ARG_HELP="help"
+ARG_HELP_SHORT="h"
+ARG_NUKE_EXISTING_CONFIG_ZSH="nuke-existing-zsh"
+ARG_NUKE_EXISTING_CONFIG_VIM="nuke-existing-vim"
+ARG_NUKE_EXISTING_CONFIG_ALL="nuke-all-existing"
+
+POST_SHELL_SETUP_MESSAGE="Now go ahead and add what you need from ${SCRIPT_DIR/#$HOME/~}/.zshrc to ~/.zshrc (see the \"User configuration\" part specifically)."
+POST_MACOS_SETUP_MESSAGE="Note that some macOS changes might require a reboot."
+
+function showError {
+  echo -e "${STYLE_RESET}${STYLE_BOLD}\nERROR: $1${STYLE_RESET}" 1>&2
+  exit 1
+}
+
+function showInfo {
+  echo -e "${STYLE_RESET}${STYLE_HEADER}./$(basename $0)${STYLE_RESET}"
+  echo "Installs and configures up a local development environment."
+  echo
+  echo "Usage:"
+  echo -e "  ${STYLE_RESET}${STYLE_SUBHEADER}--${ARG_HELP}${STYLE_RESET}|${STYLE_BOLD}-${ARG_HELP_SHORT}${STYLE_RESET}\n    Show this help section"
+  echo -e "  ${STYLE_RESET}${STYLE_SUBHEADER}--${ARG_NUKE_EXISTING_CONFIG_ZSH}${STYLE_RESET}\n    Remove existing Zsh configuration"
+  echo -e "  ${STYLE_RESET}${STYLE_SUBHEADER}--${ARG_NUKE_EXISTING_CONFIG_VIM}${STYLE_RESET}\n    Remove existing Vim configuration"
+  echo -e "  ${STYLE_RESET}${STYLE_SUBHEADER}--${ARG_NUKE_EXISTING_CONFIG_ALL}${STYLE_RESET}\n    Remove all existing configurations"
+}
+
+function printHeader {
+  echo -e "${STYLE_RESET}\n${STYLE_HEADER}$1${STYLE_RESET}"
+}
+
+function printSubheader {
+  echo -e "${STYLE_RESET}\n${STYLE_HEADER}▸${STYLE_RESET} ${STYLE_SUBHEADER}$1${STYLE_RESET}"
+}
+
+function printParagraph {
+  echo -e "${STYLE_RESET}${STYLE_PARAGRAPH_INDENT}${STYLE_PARAGRAPH}$1${STYLE_RESET}"
+}
+
+function printFormattedParagraph {
+  printf "${STYLE_RESET}${STYLE_PARAGRAPH_INDENT}${STYLE_PARAGRAPH}$1${STYLE_RESET}"
+}
+
+function clearPreviousLine {
+  printf $STYLE_CLEAR_PREVIOUS_LINE
+}
+
+function confirm {
+  prompt="${1:-Are you sure?}"
+  clearLineAfterUserInput=${2:-false}
+
+  tput bel
+
+  # call with a prompt string or use a default
+  read -r -p "$prompt (y/N) " response
+  case "$response" in
+    [yY][eE][sS]|[yY])
+      $clearLineAfterUserInput && clearPreviousLine
+      true
+      ;;
+    *)
+      $clearLineAfterUserInput && clearPreviousLine
+      false
+      ;;
+  esac
+}
+
+function waitForEnterKey {
+  tput bel
+  read -p "Press Enter to continue"
+  clearPreviousLine
+}
+
+function showLoadingIndicatorUntilProcessHasEnded {
+  idOfProcessToWaitFor="$1"
+  spinCharacters='—\|/'
+
+  stty -echo  # disable keyboard input
+
+  i=0
+  while kill -0 $idOfProcessToWaitFor 2> /dev/null
+  do
+    i=$(( (i+1) %4 ))
+    printf "${STYLE_BOLD}${spinCharacters:$i:1}"
+    sleep 0.1
+    printf "\b"
+  done
+
+  stty echo  # re-enable keybard input
+
+  printf "\b"
+}
+
+function nukeExistingZshConfig {
+  printParagraph "~/.oh-my-zsh"
+  [[ -d ~/.oh-my-zsh ]] && rm -rf ~/.oh-my-zsh
+
+  printParagraph "~/.zshrc"
+  [[ -f ~/.zshrc ]] && rm ~/.zshrc*
+
+  if [[ -f ~/.shell.pre-oh-my-zsh ]]; then
+    printParagraph "~/.shell.pre-oh-my-zsh"
+    rm ~/.shell.pre-oh-my-zsh
+  fi
+}
+
+function nukeExistingVimConfig {
+  printParagraph ${NEOVIM_CONFIG_DIR/#$HOME/'~'}
+  [[ -d $NEOVIM_CONFIG_DIR ]] && rm -rf $NEOVIM_CONFIG_DIR || true
+
+  printParagraph "~/.config/coc"
+  [[ -d ~/.config/coc ]] && rm -rf ~/.config/coc || true
+}
+
+function nukeExistingConfig {
+  case $ARG_CMD_RECEIVED in
+    $ARG_NUKE_EXISTING_CONFIG_ZSH)
+      echo -e "${STYLE_RESET}${STYLE_BOLD}WARNING: About to remove existing Zsh config.${STYLE_RESET}"
+      waitForEnterKey
+      clearPreviousLine
+      printHeader "Removing existing Zsh config..."
+      nukeExistingZshConfig
+      ;;
+    $ARG_NUKE_EXISTING_CONFIG_VIM)
+      echo -e "${STYLE_RESET}${STYLE_BOLD}WARNING: About to remove existing Vim config.${STYLE_RESET}"
+      waitForEnterKey
+      clearPreviousLine
+      printHeader "Removing existing Vim config..."
+      nukeExistingVimConfig
+      ;;
+    $ARG_NUKE_EXISTING_CONFIG_ALL)
+      echo -e "${STYLE_RESET}${STYLE_BOLD}WARNING: About to remove ALL existing configs.${STYLE_RESET}"
+      waitForEnterKey
+      clearPreviousLine
+      printHeader "Removing all existing configs..."
+
+      printSubheader "Remove existing Zsh config"
+      nukeExistingZshConfig
+
+      printSubheader "Remove existing Vim config"
+      nukeExistingVimConfig
+      ;;
+    *)
+      showError "Invalid nuke config type $ARG_CMD_RECEIVED"
+      ;;
+  esac
+
+  tput bel
+  printHeader "🗑  All done!"
+}
+
+function verifyInstalledGuiApps {
+  printSubheader "GUI applications"
+  echo -e "  ${STYLE_RESET}You might want to install some of the following applications:\n
+  • ${STYLE_RESET}${STYLE_BOLD}1Password${STYLE_RESET} - https://apps.apple.com/se/app/1password-7-password-manager/id1333542190?l=en&mt=12
+  • ${STYLE_RESET}${STYLE_BOLD}Alfred${STYLE_RESET} - https://www.alfredapp.com/
+  • ${STYLE_RESET}${STYLE_BOLD}iTerm${STYLE_RESET} - https://iterm2.com/
+  • ${STYLE_RESET}${STYLE_BOLD}Amphetamine${STYLE_RESET} - https://apps.apple.com/se/app/amphetamine/id937984704?l=en&mt=12
+  • ${STYLE_RESET}${STYLE_BOLD}Rectangle${STYLE_RESET} - https://rectangleapp.com/"
+
+  echo
+  waitForEnterKey
+  clearPreviousLine
+}
+
+function setupMacOS {
+  printSubheader "macOS defaults"
+
+  if ! confirm "${STYLE_PARAGRAPH_INDENT}About to configure macOS defaults. Continue?" true; then
+    printParagraph "Leaving as-is"
+    sleep 1
+    return
+  fi
+
+  # if don't have cached sudo credentials, request new
+  if ! sudo -n true 2> /dev/null; then
+    printf "$STYLE_PARAGRAPH_INDENT"
+    sudo -v
+    clearPreviousLine
+  fi
+
+  printFormattedParagraph "Configuring... "
+  source $SCRIPT_DIR/.macos &
+  showLoadingIndicatorUntilProcessHasEnded $!
+  printFormattedParagraph "\bdone!\r\f"
+  printParagraph "$POST_MACOS_SETUP_MESSAGE"
+
+  sleep 1
+}
+
+function bootstrap {
+  printHeader "☕️ Bootstrapping work environment..."
+
+  echo "About to bootstrap development environment."
+  waitForEnterKey
+  clearPreviousLine
+
+  [[ ! -d $CONFIG_DIR ]] && mkdir -p $CONFIG_DIR
+
+  printSubheader "macOS Command Line Tools"
+  logFile="/tmp/cmdline-tools-install.$(date +%s)"
+  xcode-select --install &> $logFile || true
+  if [[ "$(cat $logFile)" == *"already installed"* ]]; then
+    printParagraph "Command Line Tools appears to be already installed"
+  fi
+  rm $logFile
+
+  verifyInstalledGuiApps
+  setupMacOS
+
+  printSubheader "Homebrew"
+  if [[ ! "$(command -v brew)" ]]; then
+    bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+  else
+    printParagraph "\`brew\` appears to be already installed, at $(which brew)"
+  fi
+
+  printSubheader "Color schemes"
+  [[ ! -d $COLOR_SCHEMES_DIR ]] && mkdir -p $COLOR_SCHEMES_DIR
+  ## "Solarized"
+  colorThemeInstallDir_solarized="$COLOR_SCHEMES_DIR/solarized"
+  if [[ ! -d $colorThemeInstallDir_solarized ]]; then
+    printParagraph "Adding ${colorThemeInstallDir_solarized/#$HOME/~}"
+    git clone https://github.com/altercation/solarized $colorThemeInstallDir_solarized
+  else
+    printParagraph "${colorThemeInstallDir_solarized/#$HOME/~} already exists"
+  fi
+  if [[ "$(find /Applications -maxdepth 1 -iname "iterm.app" | wc -l | xargs echo)" != 0 ]]; then
+    printParagraph "Adding ${colorThemeInstallDir_solarized/#$HOME/~}/iterm2-colors-solarized to iTerm"
+    open $colorThemeInstallDir_solarized/iterm2-colors-solarized/*.itermcolors
+  else
+    printParagraph "Not adding color theme to iTerm. iTerm not found in /Applications - is it installed?"
+  fi
+  ##
+  printParagraph "Please see the documentation for each interface (iTerm2/Vim etc) on how to change color scheme"
+
+  printSubheader "zsh"
+  if [[ ! "$(command -v zsh)" ]]; then
+    brew install zsh
+  else
+    printParagraph "\`zsh\` appears to be already installed, at $(which zsh)"
+  fi
+
+  printSubheader "Oh My Zsh"
+  export RUNZSH="no"  # don't switch to zsh directly after installation
+  if [[ ! -d ~/.oh-my-zsh ]]; then
+    bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  elif [[ "$SHELL" != "$(which zsh)" ]]; then
+    printParagraph "Oh My Zsh appears to be already installed but \$SHELL ($SHELL) is not set to $(which zsh) for current user. Changing it!"
+    chsh -s $(which zsh) $(whoami)
+  else
+    printParagraph "Oh My Zsh appears to be already installed"
+  fi
+  if [[ ! -f ~/.zshrc ]]; then
+    printParagraph "No ~/.zshrc found!"
+    printParagraph "- using the whole of $SCRIPT_DIR/.zshrc as ~/.zshrc"
+    cp $SCRIPT_DIR/.zshrc ~/.zshrc
+  fi
+  echo
+  printParagraph "Oh My Zsh installation completed!"
+  printParagraph "$POST_SHELL_SETUP_MESSAGE"
+  unset RUNZSH
+
+  printSubheader "Spaceship Zsh prompt"
+  spaceshipPromptPath=$HOME/.oh-my-zsh/custom/themes/spaceship-prompt
+  if [[ ! -d $spaceshipPromptPath ]]; then
+    git clone https://github.com/denysdovhan/spaceship-prompt.git $spaceshipPromptPath --depth=1
+    ln -s "$spaceshipPromptPath/spaceship.zsh-theme" "$spaceshipPromptPath/../spaceship.zsh-theme" 
+  else
+    printParagraph "Spaceship Zsh prompt already appears to be installed at $spaceshipPromptPath"
+  fi
+
+  printSubheader "htop"
+  if [[ ! "$(command -v htop)" ]]; then
+    brew install htop
+  else
+    printParagraph "\`htop\` appears to be already installed, at $(which htop)"
+  fi
+
+  printSubheader "fzf"
+  if [[ ! "$(command -v fzf)" ]]; then
+    brew install fzf
+  else
+    printParagraph "\`fzf\` appears to be installed, at $(which fzf)"
+  fi
+
+  printSubheader "ripgrep"
+  if [[ ! "$(command -v rg)" ]]; then
+    brew install ripgrep
+  else
+    printParagraph "\`rg\` appears to be already installed, at $(which rg)"
+  fi
+  if [[ ! -f ~/.rgignore ]]; then
+    printParagraph "Adding ~/.rgignore"
+    cp $SCRIPT_DIR/.rgignore_global ~/.rgignore
+  else
+    printParagraph "~/.rgignore already exists"
+  fi
+
+  printSubheader "ctags"
+  if [[ ! "$(brew ls --versions ctags)" ]]; then
+    # we want the one from Homebrew since .zshrc references that
+    brew install ctags
+  else
+    printParagraph "\`ctags\` appears to be already installed, at $(brew --prefix ctags)"
+  fi
+
+  echo
+  printSubheader "Node Version Manager"
+  if [[ ! -d "$HOME/.nvm" ]]; then
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+  else
+    printParagraph "\`nvm\` appears to be already installed"
+  fi
+  export NVM_DIR="$HOME/.nvm"  # should also be in ~/.zshrc
+  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" || true  # should also be in ~/.zshrc
+
+  printSubheader "Node.js"
+  if [[ "$(command -v node)" != "" ]]; then
+    printParagraph "\`node\` appears to be already installed, at $(which node)"
+  elif [[ "$(command -v nodejs)" != "" ]]; then
+    printParagraph "\`nodejs\` appears to be already installed, at $(which nodejs)"
+  else
+    printParagraph "Installing latest LTS version of Node.js"
+    nvm install --lts --latest-npm
+  fi
+
+  printSubheader "pyenv"
+  if [[ ! "$(command -v pyenv)" ]]; then
+    brew install pyenv
+  else
+    printParagraph "\`pyenv\` appears to be already installed, at $(which pyenv)"
+  fi
+
+  printSubheader "Python 3"
+  if [[ ! "$(command -v python3)" ]]; then
+    latestPython3Version="$(pyenv install --list | awk '{print $1}' | grep '^[0-9]' | grep '\.[0-9]$' | grep '^3\.' | tail -1)"
+    printParagraph "Installing latest version of Python 3 ($latestPython3Version)"
+    pyenv install $latestPython3Version
+  else
+    printParagraph "\`python3\` appears to be already installed, at $(which python3)"
+  fi
+
+  printSubheader "pipenv"
+  if [[ ! "$(command -v pipenv)" ]]; then
+    brew install pipenv
+  else
+    printParagraph "\`pipenv\` appears to be already installed, at $(which pipenv)"
+  fi
+
+  printSubheader "Neovim"
+  [[ ! -d $NEOVIM_CONFIG_DIR ]] && mkdir -p $NEOVIM_CONFIG_DIR
+  if [[ ! "$(command -v nvim)" ]]; then
+    brew install neovim
+  else
+    printParagraph "\`nvim\` appears to be already installed, at $(which nvim)"
+  fi
+
+  printSubheader "Neovim Python3 provider"
+  if ! $(python3 -c "import neovim" 2> /dev/null); then
+    pip3 install neovim
+  else
+    printParagraph "\`neovim\` Python 3 package appears to be already installed"
+  fi
+
+  printSubheader "Neovim Node.js provider"
+  if ! $(node -e "require('neovim')" 2> /dev/null); then
+    npm i -g install neovim
+  else
+    printParagraph "\`neovim\` Node.js package appears to be already installed"
+  fi
+
+  printSubheader "Fonts for custom characters"
+  if [[ ! "$(brew ls --cask --versions font-hack-nerd-font)" ]]; then
+    brew tap homebrew/cask-fonts
+    brew install --cask font-hack-nerd-font
+  else
+    printParagraph "\`font-hack-nerd-font\` appears to be already installed"
+  fi
+
+  printSubheader "Neovim plugin manager and plugins"
+  [[ -d $NEOVIM_CONFIG_DIR/plugged ]] && rm -rf $NEOVIM_CONFIG_DIR/plugged
+  cp -r $SCRIPT_DIR/nvim $NEOVIM_CONFIG_DIR/../
+  [[ -d $NEOVIM_CONFIG_DIR/plugged ]] && rm -rf $NEOVIM_CONFIG_DIR/plugged
+  printParagraph "Installing in Neovim..."
+  sleep 1
+  $(brew --prefix neovim)/bin/nvim -c 'PlugInstall|qa'
+  $(brew --prefix neovim)/bin/nvim -c 'CocUpdateSync|qa'
+
+  printSubheader "VimR"
+  if [[ ! "$(command -v vimr)" ]]; then
+    brew install --cask vimr
+  else
+    printParagraph "\`vimr\` appears to be already installed, at $(which vimr)"
+  fi
+
+  printSubheader "GitHub CLI"
+  if [[ ! "$(brew ls --versions gh)" ]]; then
+    brew install github/gh/gh
+  else
+    printParagraph "\`gh\` appears to be already installed, at $(which gh)"
+  fi
+
+  printSubheader "GitX"
+  if [[ ! "$(command -v gitx)" ]]; then
+    brew install --cask rowanj-gitx
+  else
+    printParagraph "\`gitx\` appears to be already installed, at $(which gitx)"
+  fi
+
+  printSubheader "Global Git configuration"
+  if [[ ! -f ~/.gitignore ]]; then
+    printParagraph "Adding ~/.gitignore"
+    cp $SCRIPT_DIR/.gitignore_global ~/.gitignore
+  else
+    printParagraph "~/.gitignore already exists"
+  fi
+  if [[ ! -f ~/.gitconfig ]]; then
+    printParagraph "Adding ~/.gitconfig"
+    cp $SCRIPT_DIR/.gitconfig_global ~/.gitconfig
+  else
+    printParagraph "~/.gitconfig already exists"
+  fi
+  if [[ "$(git config --global user.name)" == "" ]]; then
+    printf "\n  Full name to use for Git: "
+    read globalGitUserName
+    git config --global user.name "$globalGitUserName"
+  fi
+  if [[ "$(git config --global user.email)" == "" ]]; then
+    printf "\n  Email address to use for Git: "
+    read globalGitUserEmailAddress
+    git config --global user.email "$globalGitUserEmailAddress"
+  fi
+
+  printSubheader "tldr"
+  if [[ ! "$(command -v tldr)" ]]; then
+    npm i -g tldr
+  else
+    printParagraph "\`tldr\` appears to be already installed, at $(which tldr)"
+  fi
+
+  printSubheader "\`crawler\` Node.js package"
+  if ! $(node -e "require('crawler')" 2> /dev/null); then
+    npm i -g crawler
+  else
+    printParagraph "\`crawler\` Node.js package appears to be already installed"
+  fi
+
+  printSubheader "WTF Terminal Dashboard"
+  if [[ ! "$(command -v wtfutil)" ]]; then
+    brew install wtfutil
+  else
+    printParagraph "\`wtfutil\` appears to be already installed, at $(which wtfutil)"
+  fi
+  if [[ ! -f $WTF_CONFIG_PATH ]]; then
+    if [[ ! -d "$(dirname $WTF_CONFIG_PATH)" ]]; then
+      mkdir "$(dirname $WTF_CONFIG_PATH)" 
+    fi
+    cp $SCRIPT_DIR/wtf_dashboard_config.yml $WTF_CONFIG_PATH
+    printParagraph "Added config at $WTF_CONFIG_PATH"
+  else
+    printParagraph "Config already exists at $WTF_CONFIG_PATH"
+  fi
+
+  printSubheader "tree"
+  if [[ ! "$(command -v tree)" ]]; then
+    brew install tree
+  else
+    printParagraph "\`tree\` appears to be already installed, at $(which tree)"
+  fi
+
+  if [[ :$CURRENT_PATH: != *:"$HOMEBREW_PATH":* ]]; then
+    # this will likely get modified by user from ~/.zshrc later
+    # but it's to ensure that some bare minimum paths are added
+    echo "
+    # Added by bootstrap script to ensure some directories are added to \$PATH.
+    # Most likely you will want to modify this when you add your own .zshrc config.
+    export PATH=\$PATH:$HOMEBREW_PATH" >> ~/.zshrc
+  fi
+
+  printHeader "🎉 All done!"
+  echo $POST_SHELL_SETUP_MESSAGE
+  echo $POST_MACOS_SETUP_MESSAGE
+  echo
+  waitForEnterKey
+  clearPreviousLine
+  echo "${STYLE_PARAGRAPH}Activating environment..."
+
+  exec zsh -l
+}
+
+function main {
+  # parse arguments
+  while [ $# -gt 0 ]; do
+    case $1 in
+      "--$ARG_HELP")
+        showInfo
+        exit
+        ;;
+      "-$ARG_HELP_SHORT")
+        showInfo
+        exit
+        ;;
+      "--$ARG_NUKE_EXISTING_CONFIG_ZSH")
+        ARG_CMD_RECEIVED=$ARG_NUKE_EXISTING_CONFIG_ZSH
+        nukeExistingConfig
+        exit
+        ;;
+      "--$ARG_NUKE_EXISTING_CONFIG_VIM")
+        ARG_CMD_RECEIVED=$ARG_NUKE_EXISTING_CONFIG_VIM
+        nukeExistingConfig
+        exit
+        ;;
+      "--$ARG_NUKE_EXISTING_CONFIG_ALL")
+        ARG_CMD_RECEIVED=$ARG_NUKE_EXISTING_CONFIG_ALL
+        nukeExistingConfig
+        exit
+        ;;
+      *)
+        showError "Invalid option $1"
+        ;;
+    esac
+    shift
+  done
+
+  bootstrap
+}
+
+main "$@"

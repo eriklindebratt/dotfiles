@@ -1,0 +1,51 @@
+{
+  "coc.preferences.currentFunctionSymbolAutoUpdate": true,
+  "coc.preferences.formatOnSaveFiletypes": [
+    "javascript",
+    "typescript",
+    "typescriptreact",
+    "javascriptreact",
+    "typescript.tsx",
+    "vue",
+    "css",
+    "scss",
+    "html"
+  ],
+  "diagnostic.enable": true,
+  "diagnostic.errorSign": "❗️",
+  "diagnostic.hintSign": "💡",
+  "diagnostic.infoSign": "ℹ︎",
+  "diagnostic.warningSign": "⚠️",
+  "eslint.filetypes": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "typescript.tsx",
+    "vue"
+  ],
+  "prettier.disableSuccessMessage": true,
+  "prettier.eslintIntegration": false,
+  "prettier.onlyUseLocalVersion": true,
+  "prettier.requireConfig": false,
+  "prettier.stylelintIntegration": false,
+  "python.pythonPath": "python",
+  "python.jediEnabled": false,
+  "snippets.extends": {
+    "javascriptreact": [
+      "javascript"
+    ],
+    "typescript": [
+      "javascript"
+    ],
+    "typescriptreact": [
+      "javascript"
+    ]
+  },
+  "snippets.ultisnips.directories": [
+    "~/.config/nvim/plugged/vim-javascript-snippets/snippets/javascript"
+  ],
+  "snippets.userSnippetsDirectory": "~/.config/nvim/ultisnips",
+  "suggest.echodocSupport": true,
+  "suggest.maxCompleteItemCount": 40
+}
