@@ -109,7 +109,7 @@ wtf:
       type: feedreader
       enabled: true
       feeds:
-      - http://svt.se/nyheter/rss.xml
+      - https://www.svt.se/nyheter/rss.xml
       - https://www.svt.se/nyheter/lokalt/stockholm/rss.xml
       feedLimit: 20
       position:
