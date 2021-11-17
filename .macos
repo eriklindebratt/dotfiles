@@ -346,3 +346,5 @@ defaults write com.apple.ActivityMonitor IconType -int 5
 sudo killall SystemUIServer
 sudo killall Finder
 sudo killall Dock
+
+echo "macOS bootstrap completed"
