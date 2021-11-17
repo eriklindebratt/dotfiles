@@ -11,8 +11,10 @@ nnoremap <Leader>r :so $MYVIMRC<CR>:PlugInstall<CR>:q<CR>:PlugClean<CR>:q<CR>:Co
 """
 
 " Toggle comment(s)
-nmap <leader>c <Plug>NERDCommenterToggle
-xmap <leader>c <Plug>NERDCommenterToggle
+"nmap <leader>c <Plug>NERDCommenterToggle
+"xmap <leader>c <Plug>NERDCommenterToggle
+nmap <C-_> <Plug>NERDCommenterToggle  " Ctrl+c to toggle comments in normal mode
+xmap <C-_> <Plug>NERDCommenterToggle  " Ctrl+c to toggle comments in visual mode
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
