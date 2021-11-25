@@ -200,3 +200,15 @@ function cloud_build_status() {
   gcloud builds list --project $GCP_PROJECT_ID --filter="substitutions.COMMIT_SHA=$SHA" --format="table[box, title='$(printf '\e[1m')Build Status $GCP_PROJECT_ID$(printf '\e[0m')'](substitutions.SHORT_SHA, status, logUrl)"
 }
 alias cbs="cloud_build_status"
+
+function mcd () {
+  if [ -z "$1" ]; then
+    echo "Usage: mcd <directory>" && return 1
+  fi
+
+  if [ ! -d $1 ]; then
+    mkdir -p $1
+  fi
+
+  cd $1
+}
