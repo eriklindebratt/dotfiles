@@ -425,7 +425,7 @@ function bootstrap {
 
   printSubheader "GitHub CLI"
   if [[ ! "$(brew ls --versions gh)" ]]; then
-    brew install github/gh/gh
+    brew install gh
   else
     printParagraph "\`gh\` appears to be already installed, at $(which gh)"
   fi
