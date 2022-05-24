@@ -26,6 +26,7 @@ Plug 'sheerun/vim-polyglot'
 
 " appearance and themes
 Plug 'altercation/vim-colors-solarized'
+Plug 'projekt0n/github-nvim-theme'
 Plug 'itchyny/lightline.vim'
 Plug 'preservim/nerdtree'
 

@@ -19,11 +19,13 @@ set shiftwidth=2
 set et
 
 " color theme config
-if exists('g:plug_home') && isdirectory(g:plug_home . '/vim-colors-solarized')
-  colorscheme solarized
+"if exists('g:plug_home') && isdirectory(g:plug_home . '/vim-colors-solarized')
+if exists('g:plug_home') && isdirectory(g:plug_home . '/github-nvim-theme')
+  colorscheme github_dark
   set background=dark
 else
-  echom 'WARNING: Can''t set "solarized" as colorscheme since that plugin doesn''t appear to be installed'
+  "echom 'WARNING: Can''t set "solarized" as colorscheme since that plugin doesn''t appear to be installed'
+  echom 'WARNING: Can''t set "github" as colorscheme since that plugin doesn''t appear to be installed'
 endif
 
 " hidden characters config
