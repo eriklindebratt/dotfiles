@@ -94,12 +94,17 @@ function collect {
       | grep -v "name = $(git config --global user.name)" \
       > $SCRIPT_DIR/.gitconfig_global
   fi
-
   if [[ -f ~/.gitignore ]]; then
     printParagraph "~/.gitignore"
     cp ~/.gitignore $SCRIPT_DIR/.gitignore_global
   else
     printParagraph "~/.gitignore doesn't exist"
+  fi
+  if [[ -f ~/.gitattributes ]]; then
+    printParagraph "~/.gitattributes"
+    cp ~/.gitattributes $SCRIPT_DIR/.gitattributes_global
+  else
+    printParagraph "~/.gitattributes doesn't exist"
   fi
 
   ################################################

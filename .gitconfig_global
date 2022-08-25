@@ -14,6 +14,7 @@
   excludesfile = ~/.gitignore
   quotepath = false
   editor = nvim -f
+  attributesfile = ~/.gitattributes
 [color]
   branch = auto
   diff = auto
@@ -29,4 +30,7 @@
   smudge = git-media-smudge %f
 [merge]
   tool = opendiff
+[diff "image"]
+  command = ~/bin/git_img_diff
+  textconv = imgcat
 [user]

@@ -458,6 +458,12 @@ function bootstrap {
   else
     printParagraph "~/.gitignore already exists"
   fi
+  if [[ ! -f ~/.gitattributes ]]; then
+    printParagraph "Adding ~/.gitattributes"
+    cp $SCRIPT_DIR/.gitattributes_global ~/.gitattributes
+  else
+    printParagraph "~/.gitattributes already exists"
+  fi
   if [[ ! -f ~/.gitconfig ]]; then
     printParagraph "Adding ~/.gitconfig"
     cp $SCRIPT_DIR/.gitconfig_global ~/.gitconfig

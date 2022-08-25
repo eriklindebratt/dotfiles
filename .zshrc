@@ -115,6 +115,7 @@ SPACESHIP_PROMPT_ORDER=(
 
 # You may need to manually set your language environment
 export LANG=en_US.UTF-8
+export LC_ALL=$LANG
 
 # Preferred editor for local and remote sessions
 # if [[ -n $SSH_CONNECTION ]]; then
@@ -201,7 +202,7 @@ function cloud_build_status() {
 }
 alias cbs="cloud_build_status"
 
-function mcd () {
+function mcd() {
   if [ -z "$1" ]; then
     echo "Usage: mcd <directory>" && return 1
   fi
@@ -212,3 +213,9 @@ function mcd () {
 
   cd $1
 }
+
+# enable iTerm shell integration, if such a config exists for zsh
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+# remap key to the left of the `1` key on the top bar - for a specific keyboard - to the tilde/backtick key
+hidutil property --matching '{"ProductID":0x026c}' --set '{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000064,"HIDKeyboardModifierMappingDst":0x700000035}]}' > /dev/null
