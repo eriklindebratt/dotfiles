@@ -9,12 +9,13 @@
   g = grep -ni
   find = grep -ni
   showfiles = show --name-only
-  lb = !git reflog show --pretty=format:'%gs ~ %gd' --date=relative | grep 'checkout:' | grep -oE '[^ ]+ ~ .*' | awk -F~ '!seen[$1]++' | head -n 10 | awk -F' ~ HEAD@{' '{printf(\"  \\033[33m%s: \\033[37m %s\\033[0m\\n\", substr($2, 1, length($2)-1), $1)}'
+  lb = !git reflog show --pretty=format:'%gs ~ %gd' --date=relative | grep 'checkout:' | grep -oE '[^ ]+ ~ .*' | awk -F~ '!seen[$1]++' | head -n 10 | awk -F' ~ HEAD@{' '{printf(\"  \\033[33m%s: \\033[37m %s\\033[0m\\n\", substr($2, 1, length($2)-1), $1)}' | fzf --ansi | cut -d ':' -f 2 | xargs echo | xargs git checkout
 [core]
   excludesfile = ~/.gitignore
   quotepath = false
   editor = nvim -f
   attributesfile = ~/.gitattributes
+  pager = delta
 [color]
   branch = auto
   diff = auto
@@ -30,7 +31,15 @@
   smudge = git-media-smudge %f
 [merge]
   tool = opendiff
+  conflictstyle = diff3
+[diff]
+  colorMoved = default
 [diff "image"]
   command = ~/bin/git_img_diff
   textconv = imgcat
+[interactive]
+  diffFilter = delta --color-only
+[delta]
+  navitate = true
+  light = false
 [user]

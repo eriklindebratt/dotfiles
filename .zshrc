@@ -145,6 +145,7 @@ alias "n."="nvim ."
 alias "nvim."="nvim ."
 alias gs="git s"
 alias gds="gd --staged"
+alias gb="git branch -a | fzf --ansi | cut -d ':' -f 2 | xargs echo | xargs git checkout"
 
 # initialize nvm, if installed
 export NVM_DIR="$HOME/.nvm"
