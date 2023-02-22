@@ -356,7 +356,7 @@ function bootstrap {
     printParagraph "\`nvm\` appears to be already installed"
   fi
   export NVM_DIR="$HOME/.nvm"  # should also be in ~/.zshrc
-  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" || true  # should also be in ~/.zshrc
+  [ -s "$NVM_DIR/nvm.sh" ] && (. "$NVM_DIR/nvm.sh" || true) || true  # should also be in ~/.zshrc
 
   printSubheader "Node.js"
   if [[ "$(command -v node)" != "" ]]; then
@@ -427,7 +427,7 @@ function bootstrap {
   [[ -d $NEOVIM_CONFIG_DIR/plugged ]] && rm -rf $NEOVIM_CONFIG_DIR/plugged
   printParagraph "Installing in Neovim..."
   sleep 1
-  $(brew --prefix neovim)/bin/nvim -c 'PlugInstall|qa'
+  NODE_OPTIONS=--openssl-legacy-provider $(brew --prefix neovim)/bin/nvim -c 'PlugInstall|qa'
   $(brew --prefix neovim)/bin/nvim -c 'CocUpdateSync|qa'
 
   printSubheader "VimR"
