@@ -518,6 +518,20 @@ function bootstrap {
     printParagraph "\`tree\` appears to be already installed, at $(which tree)"
   fi
 
+  printSubheader "macdown"
+  if [[ ! "$(command -v macdown)" ]]; then
+    brew install --cask macdown
+  else
+    printParagraph "\`macdown\` appears to be already installed"
+  fi
+
+  printSubheader "qlmarkdown"
+  if [[ ! $(brew ls --cask --versions qlmarkdown) ]]; then
+    brew install --cask qlmarkdown
+  else
+    printParagraph "\`qlmarkdown\` appears to be already installed."
+  fi
+
   if [[ :$CURRENT_PATH: != *:"$HOMEBREW_PATH":* ]]; then
     # this will likely get modified by user from ~/.zshrc later
     # but it's to ensure that some bare minimum paths are added
