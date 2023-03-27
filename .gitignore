@@ -3,3 +3,4 @@
 *.swp
 nvim/autoload/plug.vim
 nvim/plugged
+lvim/plugin
