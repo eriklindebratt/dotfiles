@@ -38,8 +38,8 @@ lvim.keys.visual_mode["<C-/>"] = "<Plug>(comment_toggle_linewise_visual)"
 lvim.keys.normal_mode["<C-p>"] = ":Telescope find_files<CR>"
 
 lvim.builtin.which_key.mappings["/"] = { "<cmd>:noh<CR>", "Remove highlight" }
+lvim.builtin.which_key.mappings["f"] = { "<cmd>:Telescope live_grep<CR>", "Search" }
 lvim.builtin.which_key.mappings["w"] = { "<cmd>w<CR>", "Save" }
-lvim.builtin.which_key.mappings["f"] = {}
 
 
 
@@ -84,8 +84,8 @@ lvim.builtin.alpha.mode = "dashboard"
 lvim.builtin.terminal.active = true
 lvim.builtin.nvimtree.setup.view.side = "left"
 lvim.builtin.nvimtree.setup.renderer.icons.show.git = false
-lvim.builtin.nvimtree.setup.disable_netrw = true
-lvim.builtin.nvimtree.setup.hijack_netrw = true
+lvim.builtin.project.silent_chdir = false
+lvim.builtin.project.manual_mode = true
 
 -- if you don't want all the parsers change this to a table of the ones you want
 lvim.builtin.treesitter.ensure_installed = {
@@ -147,21 +147,21 @@ lvim.builtin.treesitter.highlight.enable = true
 --   buf_set_option("omnifunc", "v:lua.vim.lsp.omnifunc")
 -- end
 
--- -- set a formatter, this will override the language server formatting capabilities (if it exists)
--- local formatters = require "lvim.lsp.null-ls.formatters"
--- formatters.setup {
---   { command = "black", filetypes = { "python" } },
---   { command = "isort", filetypes = { "python" } },
---   {
---     -- each formatter accepts a list of options identical to https://github.com/jose-elias-alvarez/null-ls.nvim/blob/main/doc/BUILTINS.md#Configuration
---     command = "prettier",
---     ---@usage arguments to pass to the formatter
---     -- these cannot contain whitespaces, options such as `--line-width 80` become either `{'--line-width', '80'}` or `{'--line-width=80'}`
---     extra_args = { "--print-with", "100" },
---     ---@usage specify which filetypes to enable. By default a providers will attach to all the filetypes it supports.
---     filetypes = { "typescript", "typescriptreact" },
---   },
--- }
+-- set a formatter, this will override the language server formatting capabilities (if it exists)
+local formatters = require "lvim.lsp.null-ls.formatters"
+formatters.setup {
+  -- { command = "black", filetypes = { "python" } },
+  -- { command = "isort", filetypes = { "python" } },
+  {
+    -- each formatter accepts a list of options identical to https://github.com/jose-elias-alvarez/null-ls.nvim/blob/main/doc/BUILTINS.md#Configuration
+    command = "prettier",
+    ---@usage arguments to pass to the formatter
+    -- these cannot contain whitespaces, options such as `--line-width 80` become either `{'--line-width', '80'}` or `{'--line-width=80'}`
+    -- extra_args = { "--print-with", "100" },
+    ---@usage specify which filetypes to enable. By default a providers will attach to all the filetypes it supports.
+    filetypes = { "typescript", "typescriptreact" },
+  },
+}
 
 -- -- set additional linters
 -- local linters = require "lvim.lsp.null-ls.linters"
