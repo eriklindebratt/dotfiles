@@ -138,8 +138,6 @@ function nukeExistingVimConfig {
   printParagraph ${NEOVIM_CONFIG_DIR/#$HOME/'~'}
   [[ -d $NEOVIM_CONFIG_DIR ]] && rm -rf $NEOVIM_CONFIG_DIR || true
 
-  [[ -d $LUNARVIM_CONFIG_DIR ]] && rm -rf $LUNARVIM_CONFIG_DIR || true
-
   printParagraph "~/.config/coc"
   [[ -d ~/.config/coc ]] && rm -rf ~/.config/coc || true
 }
@@ -443,7 +441,9 @@ function bootstrap {
   $(brew --prefix neovim)/bin/nvim -c 'CocUpdateSync|qa'
 
   printSubheader "LunarVim user config"
-  cp -r $SCRIPT_DIR/lvim $LUNARVIM_CONFIG_DIR/../
+  printParagraph "Adding config files..."
+  [[ ! -d $LUNARVIM_CONFIG_DIR ]] && mkdir -p $LUNARVIM_CONFIG_DIR
+  cp -r $SCRIPT_DIR/lvim/* $LUNARVIM_CONFIG_DIR
 
   printSubheader "VimR"
   if [[ ! "$(command -v vimr)" ]]; then
