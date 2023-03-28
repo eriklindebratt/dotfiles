@@ -17,6 +17,7 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "$0")" >/dev/null 2>&1; pwd -P)"
 CONFIG_DIR="$HOME/.config"
 NEOVIM_CONFIG_DIR="$CONFIG_DIR/nvim"
+LUNARVIM_CONFIG_DIR="$CONFIG_DIR/lvim"
 COLOR_SCHEMES_DIR="$CONFIG_DIR/color-schemes"
 WTF_CONFIG_PATH="$CONFIG_DIR/wtf/config.yml"
 
@@ -136,6 +137,8 @@ function nukeExistingZshConfig {
 function nukeExistingVimConfig {
   printParagraph ${NEOVIM_CONFIG_DIR/#$HOME/'~'}
   [[ -d $NEOVIM_CONFIG_DIR ]] && rm -rf $NEOVIM_CONFIG_DIR || true
+
+  [[ -d $LUNARVIM_CONFIG_DIR ]] && rm -rf $LUNARVIM_CONFIG_DIR || true
 
   printParagraph "~/.config/coc"
   [[ -d ~/.config/coc ]] && rm -rf ~/.config/coc || true
@@ -438,6 +441,9 @@ function bootstrap {
   sleep 1
   NODE_OPTIONS=--openssl-legacy-provider $(brew --prefix neovim)/bin/nvim -c 'PlugInstall|qa'
   $(brew --prefix neovim)/bin/nvim -c 'CocUpdateSync|qa'
+
+  printSubheader "LunarVim user config"
+  cp -r $SCRIPT_DIR/lvim $LUNARVIM_CONFIG_DIR/../
 
   printSubheader "VimR"
   if [[ ! "$(command -v vimr)" ]]; then
