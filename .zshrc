@@ -131,11 +131,11 @@ setopt interactivecomments
 
 # Preferred editor for local and remote sessions
 if [[ -n $SSH_CONNECTION ]]; then
-  export VISUAL="nvim"
-  export EDITOR="nvim"
+  export VISUAL="lvim"
+  export EDITOR="lvim"
 else
-  export VISUAL="nvim"
-  export EDITOR="nvim"
+  export VISUAL="lvim"
+  export EDITOR="lvim"
 fi
 
 # aliases
