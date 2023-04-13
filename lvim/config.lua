@@ -16,6 +16,7 @@ vim.opt.relativenumber = true
 vim.opt.timeoutlen = 300
 vim.opt.updatetime = 300
 vim.opt.smartcase = true
+vim.opt.clipboard = ""
 -- to disable icons and use a minimalist setup, uncomment the following
 -- lvim.use_icons = false
 
@@ -39,7 +40,7 @@ lvim.keys.visual_mode["<C-/>"] = "<Plug>(comment_toggle_linewise_visual)"
 lvim.keys.normal_mode["<C-p>"] = ":Telescope find_files<CR>"
 
 lvim.builtin.which_key.mappings["/"] = { "<cmd>:noh<CR>", "Remove highlight" }
-lvim.builtin.which_key.mappings["f"] = { "<cmd>:Telescope live_grep<CR>", "Search" }
+lvim.builtin.which_key.mappings["f"] = { "<cmd>:Telescope live_grep_args<CR>", "Search" }
 lvim.builtin.which_key.mappings["w"] = { "<cmd>w<CR>", "Save" }
 
 
@@ -85,6 +86,8 @@ lvim.builtin.alpha.mode = "dashboard"
 lvim.builtin.terminal.active = true
 lvim.builtin.nvimtree.setup.view.side = "left"
 lvim.builtin.nvimtree.setup.renderer.icons.show.git = false
+lvim.builtin.nvimtree.setup.filters.custom = {}
+
 lvim.builtin.project.silent_chdir = false
 lvim.builtin.project.manual_mode = true
 
@@ -189,6 +192,13 @@ lvim.plugins = {
     "folke/trouble.nvim",
     cmd = "TroubleToggle",
   },
+  {
+    "nvim-telescope/telescope-live-grep-args.nvim",
+    config = function()
+      require("telescope").load_extension("live_grep_args")
+    end
+  },
+
 }
 
 -- Autocommands (https://neovim.io/doc/user/autocmd.html)
