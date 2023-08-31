@@ -73,6 +73,11 @@ function collect {
 
   ################################################
 
+  printSubheader "WezTerm"
+  [[ -f ~/.wezterm.lua ]] && cp -r ~/.wezterm.lua $SCRIPT_DIR/
+
+  ################################################
+
   printSubheader "Neovim and its plugins"
   [[ -d $SCRIPT_DIR/nvim/autoload ]] && rm -rf $SCRIPT_DIR/nvim/autoload
   [[ -d $SCRIPT_DIR/nvim/plugged ]] && rm -rf $SCRIPT_DIR/nvim/plugged

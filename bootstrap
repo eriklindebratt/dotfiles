@@ -277,6 +277,15 @@ function bootstrap {
   ##
   printParagraph "Please see the documentation for each interface (iTerm2/Vim etc) on how to change color scheme"
 
+  printSubheader "WezTerm"
+  if [[ ! "$(command -v wezterm)" ]]; then
+    brew install wezterm
+  else
+    printParagraph "\`wezterm\` appears to be already installed, at $(which wezterm)"
+  fi
+  printParagraph "Adding WezTerm config"
+  cp $SCRIPT_DIR/.wezterm.lua ~/.wezterm.lua
+
   printSubheader "zsh"
   if [[ ! "$(command -v zsh)" ]]; then
     brew install zsh
