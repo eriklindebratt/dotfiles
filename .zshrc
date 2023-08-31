@@ -131,19 +131,19 @@ setopt interactivecomments
 
 # Preferred editor for local and remote sessions
 if [[ -n $SSH_CONNECTION ]]; then
-  export VISUAL="lvim"
-  export EDITOR="lvim"
+  export VISUAL="nvim"
+  export EDITOR="nvim"
 else
-  export VISUAL="lvim"
-  export EDITOR="lvim"
+  export VISUAL="nvim"
+  export EDITOR="nvim"
 fi
 
 # aliases
 alias ctags="$(brew --prefix)/bin/ctags"  # prefer Homebrew version of ctags
-alias n="lvim"
-alias "n."="lvim ."
+alias n="nvim"
+alias "n."="nvim ."
 alias "nvim."="nvim ."
-alias "lvim."="lvim ."
+alias "nvim."="nvim ."
 alias gs="git s"
 alias gds="gd --staged"
 alias gba="git branch -a | fzf --ansi | cut -d ':' -f 2 | xargs echo | xargs git checkout"

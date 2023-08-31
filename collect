@@ -7,9 +7,11 @@
 
 set -e
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" >/dev/null 2>&1; pwd -P)"
+SCRIPT_DIR="$(
+  cd "$(dirname "$0")" >/dev/null 2>&1
+  pwd -P
+)"
 NEOVIM_CONFIG_PATH=~/.config/nvim
-LUNARVIM_CONFIG_PATH=~/.config/lvim
 WTF_CONFIG_PATH=~/.config/wtf/config.yml
 
 STYLE_RESET=$(printf '\e[0m')
@@ -55,9 +57,15 @@ function main {
   # parse arguments
   while [ $# -gt 0 ]; do
     case $1 in
-      --help) showInfo; exit;;
-      -h) showInfo; exit;;
-      *) showError "Invalid option $1";;
+    --help)
+      showInfo
+      exit
+      ;;
+    -h)
+      showInfo
+      exit
+      ;;
+    *) showError "Invalid option $1" ;;
     esac
     shift
   done
@@ -80,10 +88,7 @@ function collect {
   ################################################
 
   printSubheader "Neovim and its plugins"
-  [[ -d $SCRIPT_DIR/nvim/autoload ]] && rm -rf $SCRIPT_DIR/nvim/autoload
-  [[ -d $SCRIPT_DIR/nvim/plugged ]] && rm -rf $SCRIPT_DIR/nvim/plugged
   [[ -d $NEOVIM_CONFIG_PATH ]] && cp -r $NEOVIM_CONFIG_PATH $SCRIPT_DIR/
-  [[ -d $LUNARVIM_CONFIG_PATH ]] && cp -r $LUNARVIM_CONFIG_PATH $SCRIPT_DIR/
 
   ################################################
 
@@ -96,10 +101,10 @@ function collect {
   fi
   if [[ -f $SCRIPT_DIR/.gitconfig_global ]]; then
     # strip Git config from user specifics
-    cat $SCRIPT_DIR/.gitconfig_global \
-      | grep -v "email = $(git config --global user.email)" \
-      | grep -v "name = $(git config --global user.name)" \
-      > $SCRIPT_DIR/.gitconfig_global
+    cat $SCRIPT_DIR/.gitconfig_global |
+      grep -v "email = $(git config --global user.email)" |
+      grep -v "name = $(git config --global user.name)" \
+        >$SCRIPT_DIR/.gitconfig_global
   fi
   if [[ -f ~/.gitignore ]]; then
     printParagraph "~/.gitignore"

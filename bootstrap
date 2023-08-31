@@ -14,10 +14,12 @@ if [[ :$CURRENT_PATH: != *:"$HOMEBREW_PATH":* ]]; then
   PATH=$CURRENT_PATH:$HOMEBREW_PATH
 fi
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" >/dev/null 2>&1; pwd -P)"
+SCRIPT_DIR="$(
+  cd "$(dirname "$0")" >/dev/null 2>&1
+  pwd -P
+)"
 CONFIG_DIR="$HOME/.config"
 NEOVIM_CONFIG_DIR="$CONFIG_DIR/nvim"
-LUNARVIM_CONFIG_DIR="$CONFIG_DIR/lvim"
 COLOR_SCHEMES_DIR="$CONFIG_DIR/color-schemes"
 WTF_CONFIG_PATH="$CONFIG_DIR/wtf/config.yml"
 
@@ -84,14 +86,14 @@ function confirm {
   # call with a prompt string or use a default
   read -r -p "$prompt (y/N) " response
   case "$response" in
-    [yY][eE][sS]|[yY])
-      $clearLineAfterUserInput && clearPreviousLine
-      true
-      ;;
-    *)
-      $clearLineAfterUserInput && clearPreviousLine
-      false
-      ;;
+  [yY][eE][sS] | [yY])
+    $clearLineAfterUserInput && clearPreviousLine
+    true
+    ;;
+  *)
+    $clearLineAfterUserInput && clearPreviousLine
+    false
+    ;;
   esac
 }
 
@@ -105,18 +107,17 @@ function showLoadingIndicatorUntilProcessHasEnded {
   idOfProcessToWaitFor="$1"
   spinCharacters='—\|/'
 
-  stty -echo  # disable keyboard input
+  stty -echo # disable keyboard input
 
   i=0
-  while kill -0 $idOfProcessToWaitFor 2> /dev/null
-  do
-    i=$(( (i+1) %4 ))
+  while kill -0 $idOfProcessToWaitFor 2>/dev/null; do
+    i=$(((i + 1) % 4))
     printf "${STYLE_BOLD}${spinCharacters:$i:1}"
     sleep 0.1
     printf "\b"
   done
 
-  stty echo  # re-enable keybard input
+  stty echo # re-enable keybard input
 
   printf "\b"
 }
@@ -144,35 +145,35 @@ function nukeExistingVimConfig {
 
 function nukeExistingConfig {
   case $ARG_CMD_RECEIVED in
-    $ARG_NUKE_EXISTING_CONFIG_ZSH)
-      echo -e "${STYLE_RESET}${STYLE_BOLD}WARNING: About to remove existing Zsh config.${STYLE_RESET}"
-      waitForEnterKey
-      clearPreviousLine
-      printHeader "Removing existing Zsh config..."
-      nukeExistingZshConfig
-      ;;
-    $ARG_NUKE_EXISTING_CONFIG_VIM)
-      echo -e "${STYLE_RESET}${STYLE_BOLD}WARNING: About to remove existing Vim config.${STYLE_RESET}"
-      waitForEnterKey
-      clearPreviousLine
-      printHeader "Removing existing Vim config..."
-      nukeExistingVimConfig
-      ;;
-    $ARG_NUKE_EXISTING_CONFIG_ALL)
-      echo -e "${STYLE_RESET}${STYLE_BOLD}WARNING: About to remove ALL existing configs.${STYLE_RESET}"
-      waitForEnterKey
-      clearPreviousLine
-      printHeader "Removing all existing configs..."
+  $ARG_NUKE_EXISTING_CONFIG_ZSH)
+    echo -e "${STYLE_RESET}${STYLE_BOLD}WARNING: About to remove existing Zsh config.${STYLE_RESET}"
+    waitForEnterKey
+    clearPreviousLine
+    printHeader "Removing existing Zsh config..."
+    nukeExistingZshConfig
+    ;;
+  $ARG_NUKE_EXISTING_CONFIG_VIM)
+    echo -e "${STYLE_RESET}${STYLE_BOLD}WARNING: About to remove existing Vim config.${STYLE_RESET}"
+    waitForEnterKey
+    clearPreviousLine
+    printHeader "Removing existing Vim config..."
+    nukeExistingVimConfig
+    ;;
+  $ARG_NUKE_EXISTING_CONFIG_ALL)
+    echo -e "${STYLE_RESET}${STYLE_BOLD}WARNING: About to remove ALL existing configs.${STYLE_RESET}"
+    waitForEnterKey
+    clearPreviousLine
+    printHeader "Removing all existing configs..."
 
-      printSubheader "Remove existing Zsh config"
-      nukeExistingZshConfig
+    printSubheader "Remove existing Zsh config"
+    nukeExistingZshConfig
 
-      printSubheader "Remove existing Vim config"
-      nukeExistingVimConfig
-      ;;
-    *)
-      showError "Invalid nuke config type $ARG_CMD_RECEIVED"
-      ;;
+    printSubheader "Remove existing Vim config"
+    nukeExistingVimConfig
+    ;;
+  *)
+    showError "Invalid nuke config type $ARG_CMD_RECEIVED"
+    ;;
   esac
 
   tput bel
@@ -203,7 +204,7 @@ function setupMacOS {
   fi
 
   # if don't have cached sudo credentials, request new
-  if ! sudo -n true 2> /dev/null; then
+  if ! sudo -n true 2>/dev/null; then
     printf "$STYLE_PARAGRAPH_INDENT"
     sudo -v
     clearPreviousLine
@@ -229,7 +230,7 @@ function bootstrap {
 
   printSubheader "macOS Command Line Tools"
   logFile="/tmp/cmdline-tools-install.$(date +%s)"
-  xcode-select --install &> $logFile || true
+  xcode-select --install &>$logFile || true
   if [[ "$(cat $logFile)" == *"already installed"* ]]; then
     printParagraph "Command Line Tools appears to be already installed"
   fi
@@ -295,7 +296,7 @@ function bootstrap {
   fi
 
   printSubheader "Oh My Zsh"
-  export RUNZSH="no"  # don't switch to zsh directly after installation
+  export RUNZSH="no" # don't switch to zsh directly after installation
   if [[ ! -d ~/.oh-my-zsh ]]; then
     bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
   elif [[ "$SHELL" != "$(which zsh)" ]]; then
@@ -318,7 +319,7 @@ function bootstrap {
   spaceshipPromptPath=$HOME/.oh-my-zsh/custom/themes/spaceship-prompt
   if [[ ! -d $spaceshipPromptPath ]]; then
     git clone https://github.com/denysdovhan/spaceship-prompt.git $spaceshipPromptPath --depth=1
-    ln -s "$spaceshipPromptPath/spaceship.zsh-theme" "$spaceshipPromptPath/../spaceship.zsh-theme" 
+    ln -s "$spaceshipPromptPath/spaceship.zsh-theme" "$spaceshipPromptPath/../spaceship.zsh-theme"
   else
     printParagraph "Spaceship Zsh prompt already appears to be installed at $spaceshipPromptPath"
   fi
@@ -365,8 +366,8 @@ function bootstrap {
   else
     printParagraph "\`nvm\` appears to be already installed"
   fi
-  export NVM_DIR="$HOME/.nvm"  # should also be in ~/.zshrc
-  [ -s "$NVM_DIR/nvm.sh" ] && (. "$NVM_DIR/nvm.sh" || true) || true  # should also be in ~/.zshrc
+  export NVM_DIR="$HOME/.nvm"                                       # should also be in ~/.zshrc
+  [ -s "$NVM_DIR/nvm.sh" ] && (. "$NVM_DIR/nvm.sh" || true) || true # should also be in ~/.zshrc
 
   printSubheader "Node.js"
   if [[ "$(command -v node)" != "" ]]; then
@@ -410,14 +411,14 @@ function bootstrap {
   fi
 
   printSubheader "Neovim Python3 provider"
-  if ! $(python3 -c "import neovim" 2> /dev/null); then
+  if ! $(python3 -c "import neovim" 2>/dev/null); then
     pip3 install neovim
   else
     printParagraph "\`neovim\` Python 3 package appears to be already installed"
   fi
 
   printSubheader "Neovim Node.js provider"
-  if ! $(node -e "require('neovim')" 2> /dev/null); then
+  if ! $(node -e "require('neovim')" 2>/dev/null); then
     npm i -g install neovim
   else
     printParagraph "\`neovim\` Node.js package appears to be already installed"
@@ -431,19 +432,8 @@ function bootstrap {
     printParagraph "\`font-hack-nerd-font\` appears to be already installed"
   fi
 
-  printSubheader "Neovim plugin manager and plugins"
-  [[ -d $NEOVIM_CONFIG_DIR/plugged ]] && rm -rf $NEOVIM_CONFIG_DIR/plugged
+  printSubheader "Neovim configs"
   cp -r $SCRIPT_DIR/nvim $NEOVIM_CONFIG_DIR/../
-  [[ -d $NEOVIM_CONFIG_DIR/plugged ]] && rm -rf $NEOVIM_CONFIG_DIR/plugged
-  printParagraph "Installing in Neovim..."
-  sleep 1
-  NODE_OPTIONS=--openssl-legacy-provider $(brew --prefix neovim)/bin/nvim -c 'PlugInstall|qa'
-  $(brew --prefix neovim)/bin/nvim -c 'CocUpdateSync|qa'
-
-  printSubheader "LunarVim user config"
-  printParagraph "Adding config files..."
-  [[ ! -d $LUNARVIM_CONFIG_DIR ]] && mkdir -p $LUNARVIM_CONFIG_DIR
-  cp -r $SCRIPT_DIR/lvim/* $LUNARVIM_CONFIG_DIR
 
   printSubheader "VimR"
   if [[ ! "$(command -v vimr)" ]]; then
@@ -504,7 +494,7 @@ function bootstrap {
   fi
 
   printSubheader "\`crawler\` Node.js package"
-  if ! $(node -e "require('crawler')" 2> /dev/null); then
+  if ! $(node -e "require('crawler')" 2>/dev/null); then
     npm i -g crawler
   else
     printParagraph "\`crawler\` Node.js package appears to be already installed"
@@ -518,7 +508,7 @@ function bootstrap {
   fi
   if [[ ! -f $WTF_CONFIG_PATH ]]; then
     if [[ ! -d "$(dirname $WTF_CONFIG_PATH)" ]]; then
-      mkdir "$(dirname $WTF_CONFIG_PATH)" 
+      mkdir "$(dirname $WTF_CONFIG_PATH)"
     fi
     cp $SCRIPT_DIR/wtf_dashboard_config.yml $WTF_CONFIG_PATH
     printParagraph "Added config at $WTF_CONFIG_PATH"
@@ -553,7 +543,7 @@ function bootstrap {
     echo "
     # Added by bootstrap script to ensure some directories are added to \$PATH.
     # Most likely you will want to modify this when you add your own .zshrc config.
-    export PATH=\$PATH:$HOMEBREW_PATH" >> ~/.zshrc
+    export PATH=\$PATH:$HOMEBREW_PATH" >>~/.zshrc
   fi
 
   printHeader "🎉 All done!"
@@ -571,32 +561,32 @@ function main {
   # parse arguments
   while [ $# -gt 0 ]; do
     case $1 in
-      "--$ARG_HELP")
-        showInfo
-        exit
-        ;;
-      "-$ARG_HELP_SHORT")
-        showInfo
-        exit
-        ;;
-      "--$ARG_NUKE_EXISTING_CONFIG_ZSH")
-        ARG_CMD_RECEIVED=$ARG_NUKE_EXISTING_CONFIG_ZSH
-        nukeExistingConfig
-        exit
-        ;;
-      "--$ARG_NUKE_EXISTING_CONFIG_VIM")
-        ARG_CMD_RECEIVED=$ARG_NUKE_EXISTING_CONFIG_VIM
-        nukeExistingConfig
-        exit
-        ;;
-      "--$ARG_NUKE_EXISTING_CONFIG_ALL")
-        ARG_CMD_RECEIVED=$ARG_NUKE_EXISTING_CONFIG_ALL
-        nukeExistingConfig
-        exit
-        ;;
-      *)
-        showError "Invalid option $1"
-        ;;
+    "--$ARG_HELP")
+      showInfo
+      exit
+      ;;
+    "-$ARG_HELP_SHORT")
+      showInfo
+      exit
+      ;;
+    "--$ARG_NUKE_EXISTING_CONFIG_ZSH")
+      ARG_CMD_RECEIVED=$ARG_NUKE_EXISTING_CONFIG_ZSH
+      nukeExistingConfig
+      exit
+      ;;
+    "--$ARG_NUKE_EXISTING_CONFIG_VIM")
+      ARG_CMD_RECEIVED=$ARG_NUKE_EXISTING_CONFIG_VIM
+      nukeExistingConfig
+      exit
+      ;;
+    "--$ARG_NUKE_EXISTING_CONFIG_ALL")
+      ARG_CMD_RECEIVED=$ARG_NUKE_EXISTING_CONFIG_ALL
+      nukeExistingConfig
+      exit
+      ;;
+    *)
+      showError "Invalid option $1"
+      ;;
     esac
     shift
   done
