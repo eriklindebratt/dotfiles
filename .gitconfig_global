@@ -40,6 +40,6 @@
 [interactive]
   diffFilter = delta --color-only
 [delta]
-  navitate = true
+  navigate = true
   light = false
 [user]

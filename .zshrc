@@ -143,6 +143,7 @@ alias ctags="$(brew --prefix)/bin/ctags"  # prefer Homebrew version of ctags
 alias n="nvim"
 alias "n."="nvim ."
 alias "nvim."="nvim ."
+alias "nvim."="nvim ."
 alias gs="git s"
 alias gds="gd --staged"
 alias gba="git branch -a | fzf --ansi | cut -d ':' -f 2 | xargs echo | xargs git checkout"
