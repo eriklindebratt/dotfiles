@@ -486,6 +486,14 @@ function bootstrap {
     git config --global user.email "$globalGitUserEmailAddress"
   fi
 
+  printSubheader "tmux"
+  if [[ ! -f ~/.tmux.conf ]]; then
+    printParagraph "Adding ~/.tmux.conf"
+    cp $SCRIPT_DIR/.tmux.conf ~/.tmux.conf
+  else
+    printParagraph "~/.tmux.conf already exists"
+  fi
+
   printSubheader "tldr"
   if [[ ! "$(command -v tldr)" ]]; then
     npm i -g tldr

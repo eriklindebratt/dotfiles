@@ -92,6 +92,16 @@ function collect {
 
   ################################################
 
+  printSubheader "tmux"
+  if [[ -f ~/.tmux.conf ]]; then
+    printParagraph "~/.tmux.conf"
+    cp ~/.tmux.conf $SCRIPT_DIR/.tmux.conf
+  else
+    printParagraph "~/.tmux.conf doesn't exist"
+  fi
+
+  ################################################
+
   printSubheader "Git"
   if [[ -f ~/.gitconfig ]]; then
     printParagraph "~/.gitconfig"
