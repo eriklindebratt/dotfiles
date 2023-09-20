@@ -12,23 +12,29 @@ end
 
 -- This is where you actually apply your config choices
 
+config.color_scheme = "tokyonight"
+config.check_for_updates = true
+config.enable_tab_bar = false
 config.font_size = 16
 config.font = wezterm.font_with_fallback({
 	"Menlo",
 	"Hack Nerd Font Mono",
 })
-config.color_scheme = "tokyonight"
-config.check_for_updates = true
 config.keys = {
 	-- Make Option-Left equivalent to Alt-b which many line editors interpret as backward-word
 	{ key = "LeftArrow", mods = "OPT", action = wezterm.action({ SendString = "\x1bb" }) },
 	-- Make Option-Right equivalent to Alt-f; forward-word
 	{ key = "RightArrow", mods = "OPT", action = wezterm.action({ SendString = "\x1bf" }) },
+	-- Disable default key binding for opening a new tab
 	{ key = "t", mods = "SUPER", action = wezterm.action.DisableDefaultAssignment },
+	-- Ensure confirmation when closing window using keyboard shortcut
+	{
+		key = "w",
+		mods = "CMD",
+		action = wezterm.action.CloseCurrentTab({ confirm = true }),
+	},
 }
-
-config.enable_tab_bar = false
-config.window_decorations = "RESIZE" -- "INTEGRATED_BUTTONS|RESIZE"
+config.window_decorations = "RESIZE" -- See also "INTEGRATED_BUTTONS|RESIZE"
 
 -- and finally, return the configuration to wezterm
 return config
