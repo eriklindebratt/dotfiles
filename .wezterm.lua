@@ -24,7 +24,11 @@ config.keys = {
 	{ key = "LeftArrow", mods = "OPT", action = wezterm.action({ SendString = "\x1bb" }) },
 	-- Make Option-Right equivalent to Alt-f; forward-word
 	{ key = "RightArrow", mods = "OPT", action = wezterm.action({ SendString = "\x1bf" }) },
+	{ key = "t", mods = "SUPER", action = wezterm.action.DisableDefaultAssignment },
 }
+
+config.enable_tab_bar = false
+config.window_decorations = "RESIZE" -- "INTEGRATED_BUTTONS|RESIZE"
 
 -- and finally, return the configuration to wezterm
 return config
