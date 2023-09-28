@@ -20,7 +20,6 @@ SCRIPT_DIR="$(
 )"
 CONFIG_DIR="$HOME/.config"
 NEOVIM_CONFIG_DIR="$CONFIG_DIR/nvim"
-COLOR_SCHEMES_DIR="$CONFIG_DIR/color-schemes"
 WTF_CONFIG_PATH="$CONFIG_DIR/wtf/config.yml"
 
 STYLE_RESET=$(printf '\e[0m')
@@ -245,39 +244,6 @@ function bootstrap {
   else
     printParagraph "\`brew\` appears to be already installed, at $(which brew)"
   fi
-
-  printSubheader "Color schemes"
-  [[ ! -d $COLOR_SCHEMES_DIR ]] && mkdir -p $COLOR_SCHEMES_DIR
-  ## "Solarized"
-  colorThemeInstallDir_solarized="$COLOR_SCHEMES_DIR/solarized"
-  if [[ ! -d $colorThemeInstallDir_solarized ]]; then
-    printParagraph "Adding ${colorThemeInstallDir_solarized/#$HOME/~}"
-    git clone https://github.com/altercation/solarized $colorThemeInstallDir_solarized
-  else
-    printParagraph "${colorThemeInstallDir_solarized/#$HOME/~} already exists"
-  fi
-  if [[ "$(find /Applications -maxdepth 1 -iname "iterm.app" | wc -l | xargs echo)" != 0 ]]; then
-    printParagraph "Adding ${colorThemeInstallDir_solarized/#$HOME/~}/iterm2-colors-solarized to iTerm"
-    open $colorThemeInstallDir_solarized/iterm2-colors-solarized/*.itermcolors
-  else
-    printParagraph "Not adding color theme to iTerm. iTerm not found in /Applications - is it installed?"
-  fi
-  ## "GitHub"
-  colorThemeInstallDir_github="$COLOR_SCHEMES_DIR/github"
-  if [[ ! -d $colorThemeInstallDir_github ]]; then
-    printParagraph "Adding ${colorThemeInstallDir_github/#$HOME/~}"
-    git clone https://github.com/projekt0n/github-nvim-theme $colorThemeInstallDir_github
-  else
-    printParagraph "${colorThemeInstallDir_github/#$HOME/~} already exists"
-  fi
-  if [[ "$(find /Applications -maxdepth 1 -iname "iterm.app" | wc -l | xargs echo)" != 0 ]]; then
-    printParagraph "Adding ${colorThemeInstallDir_github/#$HOME/~}/iterm2-colors-solarized to iTerm"
-    open $colorThemeInstallDir_github/terminal/iterm/*.itermcolors
-  else
-    printParagraph "Not adding color theme to iTerm. iTerm not found in /Applications - is it installed?"
-  fi
-  ##
-  printParagraph "Please see the documentation for each interface (iTerm2/Vim etc) on how to change color scheme"
 
   printSubheader "WezTerm"
   if [[ ! "$(command -v wezterm)" ]]; then
