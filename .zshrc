@@ -73,6 +73,7 @@ plugins=(git ripgrep)
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
+[ -e ~/.zsh_profile ] && source ~/.zsh_profile
 
 SPACESHIP_PROMPT_ORDER=(
   time          # Time stamps section
@@ -219,9 +220,5 @@ function mcd() {
 # enable iTerm shell integration, if such a config exists for zsh
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
-# remap keys for a specific keyboard
-# - from: "§±" (left of of "1" on the top bar on some keyboard layouts)
-#   to: "`~" to the right of left shift key (only available on some layouts)
-# - from: "`~" key to the right of left shift key (only available on some keyboard layouts)
-#   to: left shift key (emulating a wide shift key, as on proper US keyboard layout)
-hidutil property --matching '{"ProductID":0x026c}' --set '{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000064,"HIDKeyboardModifierMappingDst":0x700000035},{"HIDKeyboardModifierMappingSrc":0x700000035,"HIDKeyboardModifierMappingDst":0x7000000E1}]}' > /dev/null
+# initialize zoxide
+eval "$(zoxide init zsh)"
