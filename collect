@@ -12,6 +12,7 @@ SCRIPT_DIR="$(
   pwd -P
 )"
 NEOVIM_CONFIG_PATH=~/.config/nvim
+TMUX_CONFIG_PATH=~/.config/tmux/tmux.conf
 WTF_CONFIG_PATH=~/.config/wtf/config.yml
 
 STYLE_RESET=$(printf '\e[0m')
@@ -92,12 +93,10 @@ function collect {
 
   ################################################
 
-  printSubheader "tmux"
-  if [[ -f ~/.tmux.conf ]]; then
-    printParagraph "~/.tmux.conf"
-    cp ~/.tmux.conf $SCRIPT_DIR/.tmux.conf
-  else
-    printParagraph "~/.tmux.conf doesn't exist"
+  printSubheader "tmux configuration"
+  if [[ -f $TMUX_CONFIG_PATH ]]; then
+    [ ! -d $SCRIPT_DIR/tmux ] && mkdir $SCRIPT_DIR/tmux
+    cp -r $TMUX_CONFIG_PATH $SCRIPT_DIR/tmux/tmux.conf
   fi
 
   ################################################

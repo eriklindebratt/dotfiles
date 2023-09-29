@@ -20,6 +20,7 @@ SCRIPT_DIR="$(
 )"
 CONFIG_DIR="$HOME/.config"
 NEOVIM_CONFIG_DIR="$CONFIG_DIR/nvim"
+TMUX_CONFIG_DIR="$CONFIG_DIR/tmux"
 WTF_CONFIG_PATH="$CONFIG_DIR/wtf/config.yml"
 
 STYLE_RESET=$(printf '\e[0m')
@@ -137,9 +138,6 @@ function nukeExistingZshConfig {
 function nukeExistingVimConfig {
   printParagraph ${NEOVIM_CONFIG_DIR/#$HOME/'~'}
   [[ -d $NEOVIM_CONFIG_DIR ]] && rm -rf $NEOVIM_CONFIG_DIR || true
-
-  printParagraph "~/.config/coc"
-  [[ -d ~/.config/coc ]] && rm -rf ~/.config/coc || true
 }
 
 function nukeExistingConfig {
@@ -408,6 +406,21 @@ function bootstrap {
     printParagraph "\`vimr\` appears to be already installed, at $(which vimr)"
   fi
 
+  printSubheader "tmux"
+  if [[ ! "$(command -v tmux)" ]]; then
+    brew install tmux
+  else
+    printParagraph "\`tmux\` appears to be already installed, at $(which tmux)"
+  fi
+  printParagraph "Adding config files"
+  cp -r $SCRIPT_DIR/tmux $TMUX_CONFIG_DIR/../
+  if [[ ! -d $TMUX_CONFIG_DIR/plugins ]]; then
+    printParagraph "Installing tpm"
+    git clone https://github.com/tmux-plugins/tpm $TMUX_CONFIG_DIR/plugins/tpm
+  else
+    printParagraph "tpm appears to be already installed"
+  fi
+
   printSubheader "GitHub CLI"
   if [[ ! "$(brew ls --versions gh)" ]]; then
     brew install gh
@@ -450,14 +463,6 @@ function bootstrap {
     printf "\n  Email address to use for Git: "
     read globalGitUserEmailAddress
     git config --global user.email "$globalGitUserEmailAddress"
-  fi
-
-  printSubheader "tmux"
-  if [[ ! -f ~/.tmux.conf ]]; then
-    printParagraph "Adding ~/.tmux.conf"
-    cp $SCRIPT_DIR/.tmux.conf ~/.tmux.conf
-  else
-    printParagraph "~/.tmux.conf already exists"
   fi
 
   printSubheader "tldr"
