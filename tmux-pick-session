@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+if [[ $# -eq 1 ]]; then
+  selected=$1
+else
+  config_dirs=("~/.config/nvim" "~/.config/tmux")
+  all_dirs=(${config_dirs[@]} $(find ~/dev -mindepth 1 -maxdepth 1 -type d))
+
+  selected=$(printf "%s\n" ${all_dirs[@]} | sed "s|$HOME|~|" | fzf)
+fi
+
+if [[ -z $selected ]]; then
+  exit 0
+fi
+
+selected_abs_path=$(echo $selected | sed "s|~|$HOME|")
+selected_parent_name="$(basename $(dirname $selected) | tr . _ | sed 's/_//')"
+selected_name=${selected_parent_name}/$(basename "$selected_abs_path" | tr . _)
+tmux_running=$(pgrep tmux)
+
+if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
+  tmux new-session -s $selected_name -c $selected_abs_path
+  exit 0
+fi
+
+if ! tmux has-session -t=$selected_name 2>/dev/null; then
+  tmux new-session -ds $selected_name -c $selected_abs_path
+fi
+
+tmux switch-client -t $selected_name

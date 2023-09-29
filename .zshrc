@@ -180,36 +180,6 @@ export FZF_DEFAULT_COMMAND='rg --files --follow --hidden --no-ignore-vcs'
 # path to NeoVim log file
 export NVIM_LOG_FILE=~/.cache/nvim/log
 
-# show current Kubernetes context on right-hand side of shell, if kubectl is installed
-#if [[ -x "$(command -v kubectl)" ]]; then
-  ## get current Kubernetes context
-  #function print_kube_context() {
-    #echo ${$(kubectl config current-context 2> /dev/null):-"(unknown)"}
-  #}
-
-  #RPROMPT='%{%B%F{blue}%}☸️  $(print_kube_context)%{%f%k%b%K{black}%B%F{green}%}'
-#fi
-
-# add paths to Google Cloud SDK
-if [ -f "$HOME/google-cloud-sdk/path.zsh.inc" ]; then . "$HOME/google-cloud-sdk/path.zsh.inc"; fi
-
-# add zsh command completion for Google Cloud CLI
-if [ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/google-cloud-sdk/completion.zsh.inc"; fi
-
-function cloud_build_status() {
-  local SHA=$1
-  if [ -z $SHA ]; then
-    SHA=$(git rev-parse HEAD)
-  fi
-
-  local GCP_PROJECT_ID=$(gcloud config list --format="value(core.project)")
-
-  echo -e "Getting Cloud Build status for $(printf '\e[1m')$SHA$(printf '\e[0m') in $(printf '\e[1m')$GCP_PROJECT_ID$(printf '\e[0m')…"
-
-  gcloud builds list --project $GCP_PROJECT_ID --filter="substitutions.COMMIT_SHA=$SHA" --format="table[box, title='$(printf '\e[1m')Build Status $GCP_PROJECT_ID$(printf '\e[0m')'](substitutions.SHORT_SHA, status, logUrl)"
-}
-alias cbs="cloud_build_status"
-
 function mcd() {
   if [ -z "$1" ]; then
     echo "Usage: mcd <directory>" && return 1
@@ -222,8 +192,16 @@ function mcd() {
   cd $1
 }
 
+# initialize zoxide
+eval "$(zoxide init zsh)"
+
+bindkey -s ^f "~/dev/dotfiles/tmux-pick-session\n"
+
 # enable iTerm shell integration, if such a config exists for zsh
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
-# initialize zoxide
-eval "$(zoxide init zsh)"
+# add paths to Google Cloud SDK
+if [ -f "$HOME/google-cloud-sdk/path.zsh.inc" ]; then . "$HOME/google-cloud-sdk/path.zsh.inc"; fi
+
+# add zsh command completion for Google Cloud CLI
+if [ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/google-cloud-sdk/completion.zsh.inc"; fi
