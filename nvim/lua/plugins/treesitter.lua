@@ -4,7 +4,6 @@ return {
     "nvim-treesitter/nvim-treesitter",
     opts = function(_, opts)
       vim.list_extend(opts.ensure_installed, {
-
         "astro",
         "bash",
         "c",
@@ -52,6 +51,14 @@ return {
         "xml",
         "yaml",
       })
+
+      --[[
+      Since treesitter currently lacks support for `zsh` filetypes, use `bash` parser.
+      More info:
+      - https://github.com/nvim-treesitter/nvim-treesitter/issues/2282
+      - https://github.com/nvim-treesitter/nvim-treesitter/issues/655#issuecomment-1470096879
+      --]]
+      vim.treesitter.language.register("bash", "zsh")
     end,
   },
 }
