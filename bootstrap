@@ -315,6 +315,13 @@ function bootstrap {
     printParagraph "~/.rgignore already exists"
   fi
 
+  printSubheader "fd"
+  if [[ ! "$(command -v fd)" ]]; then
+    brew install fd
+  else
+    printParagraph "\`fd\` appears to be installed, at $(which fd)"
+  fi
+
   printSubheader "ctags"
   if [[ ! "$(brew ls --versions ctags)" ]]; then
     # we want the one from Homebrew since .zshrc references that
