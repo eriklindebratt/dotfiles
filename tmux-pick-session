@@ -15,16 +15,17 @@ fi
 
 selected_abs_path=$(echo $selected | sed "s|~|$HOME|")
 selected_parent_name="$(basename $(dirname $selected) | tr . _ | sed 's/_//')"
-selected_name=${selected_parent_name}/$(basename "$selected_abs_path" | tr . _)
-tmux_running=$(pgrep tmux)
-
-if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
-  tmux new-session -s $selected_name -c $selected_abs_path
-  exit 0
+selected_name=$(basename "$selected_abs_path" | tr . _)
+if [[ ! -z $selected_parent_name ]]; then
+  selected_name=${selected_parent_name}/$selected_name
 fi
+tmux_running=$(pgrep tmux)
 
 if ! tmux has-session -t=$selected_name 2>/dev/null; then
   tmux new-session -ds $selected_name -c $selected_abs_path
+
+  while ! tmux has-session -t=$selected_name; do sleep 0.05; done
+  tmux new-window -dt $selected_name: -c $selected_abs_path
 fi
 
 if [[ -z $TMUX ]]; then
