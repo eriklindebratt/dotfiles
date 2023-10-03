@@ -36,5 +36,11 @@ config.keys = {
 }
 config.window_decorations = "RESIZE" -- See also "INTEGRATED_BUTTONS|RESIZE"
 
+-- Start WezTerm maximized
+wezterm.on("gui-startup", function()
+  local tab, pane, window = wezterm.mux.spawn_window({})
+  window:gui_window():maximize()
+end)
+
 -- and finally, return the configuration to wezterm
 return config
