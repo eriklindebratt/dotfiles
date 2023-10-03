@@ -22,6 +22,7 @@ return {
         "gitcommit",
         "gitignore",
         "graphql",
+        "go",
         "hcl",
         "html",
         "htmldjango",

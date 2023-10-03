@@ -11,6 +11,7 @@ return {
         "bash-language-server",
         "black",
         "dockerfile-language-server",
+        "gopls",
         "graphql-language-service-cli",
         "html-lsp",
         "json-lsp",
