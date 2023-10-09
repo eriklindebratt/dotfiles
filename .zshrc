@@ -72,6 +72,8 @@ plugins=(git ripgrep)
 
 source $ZSH/oh-my-zsh.sh
 
+source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
 # User configuration
 [ -e ~/.zsh_profile ] && source ~/.zsh_profile
 

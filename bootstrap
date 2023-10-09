@@ -269,6 +269,12 @@ function bootstrap {
   else
     printParagraph "Oh My Zsh appears to be already installed"
   fi
+  if [[ ! $(brew ls zsh-autosuggestions 2>/dev/null) ]]; then
+    printParagraph "Installing \`zsh-autosuggestions\`"
+    brew install zsh-autosuggestions
+  else
+    printParagraph "\`zsh-autosuggestions\` appears to be already installed"
+  fi
   if [[ ! -f ~/.zshrc ]]; then
     printParagraph "No ~/.zshrc found!"
     printParagraph "- using the whole of $SCRIPT_DIR/.zshrc as ~/.zshrc"
