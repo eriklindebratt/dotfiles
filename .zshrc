@@ -198,6 +198,7 @@ function mcd() {
 eval "$(zoxide init zsh)"
 
 bindkey -s ^f "~/dev/dotfiles/tmux-pick-session\n"
+bindkey -s ^e "nvim .\n"
 
 # enable iTerm shell integration, if such a config exists for zsh
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
