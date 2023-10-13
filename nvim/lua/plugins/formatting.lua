@@ -1,0 +1,25 @@
+return {
+  "stevearc/conform.nvim",
+  optional = true,
+  opts = {
+    formatters_by_ft = {
+      ["javascript"] = { { "prettier", "prettierd" } },
+      ["javascriptreact"] = { { "prettier", "prettierd" } },
+      ["typescript"] = { { "prettier", "prettierd" } },
+      ["typescriptreact"] = { { "prettier", "prettierd" } },
+      ["vue"] = { { "prettier", "prettierd" } },
+      ["css"] = { { "prettier", "prettierd" } },
+      ["scss"] = { { "prettier", "prettierd" } },
+      ["less"] = { { "prettier", "prettierd" } },
+      ["html"] = { { "prettier", "prettierd" } },
+      ["json"] = { { "prettier", "prettierd" } },
+      ["jsonc"] = { { "prettier", "prettierd" } },
+      ["yaml"] = { { "prettier", "prettierd" } },
+      ["markdown"] = { { "prettier", "prettierd" } },
+      ["markdown.mdx"] = { { "prettier", "prettierd" } },
+      ["graphql"] = { { "prettier", "prettierd" } },
+      ["handlebars"] = { { "prettier", "prettierd" } },
+      ["lua"] = { "stylua" },
+    },
+  },
+}
