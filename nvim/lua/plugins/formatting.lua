@@ -20,6 +20,7 @@ return {
       ["graphql"] = { { "prettier", "prettierd" } },
       ["handlebars"] = { { "prettier", "prettierd" } },
       ["lua"] = { "stylua" },
+      ["python"] = { "black" },
     },
   },
 }
