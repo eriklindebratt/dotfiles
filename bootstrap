@@ -382,7 +382,7 @@ function bootstrap {
   printSubheader "Neovim"
   [[ ! -d $NEOVIM_CONFIG_DIR ]] && mkdir -p $NEOVIM_CONFIG_DIR
   if [[ ! "$(command -v nvim)" ]]; then
-    brew install neovim
+    brew install --HEAD neovim
   else
     printParagraph "\`nvim\` appears to be already installed, at $(which nvim)"
   fi
