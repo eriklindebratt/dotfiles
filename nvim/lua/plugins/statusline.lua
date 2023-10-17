@@ -1,3 +1,5 @@
+local Util = require("lazyvim.util")
+
 return {
   "nvim-lualine/lualine.nvim",
   event = "VeryLazy",
@@ -17,7 +19,6 @@ return {
     lualine_require.require = require
 
     local icons = require("lazyvim.config").icons
-    local Util = require("lazyvim.util")
 
     vim.o.laststatus = vim.g.lualine_laststatus
 
@@ -30,7 +31,9 @@ return {
       sections = {
         lualine_a = { "mode" },
         lualine_b = { "branch" },
+
         lualine_c = {
+          Util.lualine.root_dir(),
           {
             "diagnostics",
             symbols = {
@@ -42,11 +45,7 @@ return {
           },
           { "filetype" },
           { "fileformat" },
-          {
-            function()
-              return Util.root.pretty_path()
-            end,
-          },
+          { Util.lualine.pretty_path() },
           {
             function()
               return require("nvim-navic").get_location()
@@ -72,7 +71,7 @@ return {
           -- stylua: ignore
           {
             function() return "  " .. require("dap").status() end,
-            cond = function() return package.loaded["dap"] and require("dap").status() ~= "" end,
+            cond = function () return package.loaded["dap"] and require("dap").status() ~= "" end,
             color = Util.ui.fg("Debug"),
           },
           {
@@ -87,6 +86,16 @@ return {
               modified = icons.git.modified,
               removed = icons.git.removed,
             },
+            source = function()
+              local gitsigns = vim.b.gitsigns_status_dict
+              if gitsigns then
+                return {
+                  added = gitsigns.added,
+                  modified = gitsigns.changed,
+                  removed = gitsigns.removed,
+                }
+              end
+            end,
           },
         },
         lualine_y = {
