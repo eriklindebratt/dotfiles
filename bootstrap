@@ -410,6 +410,7 @@ function bootstrap {
   fi
 
   printSubheader "Neovim configs"
+  [[ ! -d $NEOVIM_CONFIG_DIR ]] && mkdir -p $NEOVIM_CONFIG_DIR
   cp -r $SCRIPT_DIR/nvim $NEOVIM_CONFIG_DIR/../
 
   printSubheader "VimR"
@@ -426,6 +427,7 @@ function bootstrap {
     printParagraph "\`tmux\` appears to be already installed, at $(which tmux)"
   fi
   printParagraph "Adding config files"
+  [[ ! -d $TMUX_CONFIG_DIR ]] && mkdir -p $TMUX_CONFIG_DIR
   cp -r $SCRIPT_DIR/tmux $TMUX_CONFIG_DIR/../
   if [[ ! -d $TMUX_CONFIG_DIR/plugins ]]; then
     printParagraph "Installing tpm"
