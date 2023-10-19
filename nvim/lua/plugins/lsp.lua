@@ -7,20 +7,25 @@ return {
     opts = function(_, opts)
       local ensure_installed = {
         -- NOTE: Remember to add languages in `treesitter.lua` as necesssary
-        "lua-language-server",
         "bash-language-server",
         "black",
+        "css-lsp",
         "dockerfile-language-server",
         "eslint-lsp",
         "gopls",
         "graphql-language-service-cli",
         "html-lsp",
         "json-lsp",
+        "lua-language-server",
         "nginx-language-server",
         "prettier",
         "pyright",
         "tailwindcss-language-server",
+        "tflint",
         "typescript-language-server",
+        "shellcheck",
+        "stylelint",
+        "svelte-language-server",
         "sqlls",
         -- see lazy.lua for LazyVim extras
       }
