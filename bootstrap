@@ -251,6 +251,12 @@ function bootstrap {
   fi
   printParagraph "Adding WezTerm config"
   cp $SCRIPT_DIR/.wezterm.lua ~/.wezterm.lua
+  # https://wezfurlong.org/wezterm/faq.html?h=undercurl#how-do-i-enable-undercurl-curly-underlines
+  printParagraph "Adding WezTerm terminfo (fixing e.g. undercurl support for Neovim)"
+  tempfile=$(mktemp)
+  curl -fsSLo $tempfile https://raw.githubusercontent.com/wez/wezterm/master/termwiz/data/wezterm.terminfo
+  tic -x -o ~/.terminfo $tempfile
+  rm $tempfile
 
   printSubheader "zsh"
   if [[ ! "$(command -v zsh)" ]]; then
