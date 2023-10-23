@@ -182,9 +182,7 @@ function verifyInstalledGuiApps {
   echo -e "  ${STYLE_RESET}You might want to install some of the following applications:\n
   • ${STYLE_RESET}${STYLE_BOLD}1Password${STYLE_RESET} - https://apps.apple.com/se/app/1password-7-password-manager/id1333542190?l=en&mt=12
   • ${STYLE_RESET}${STYLE_BOLD}Alfred${STYLE_RESET} - https://www.alfredapp.com/
-  • ${STYLE_RESET}${STYLE_BOLD}iTerm${STYLE_RESET} - https://iterm2.com/
-  • ${STYLE_RESET}${STYLE_BOLD}Amphetamine${STYLE_RESET} - https://apps.apple.com/se/app/amphetamine/id937984704?l=en&mt=12
-  • ${STYLE_RESET}${STYLE_BOLD}Rectangle${STYLE_RESET} - https://rectangleapp.com/"
+  • ${STYLE_RESET}${STYLE_BOLD}Amphetamine${STYLE_RESET} - https://apps.apple.com/se/app/amphetamine/id937984704?l=en&mt=12"
 
   echo
   waitForEnterKey
@@ -535,6 +533,13 @@ function bootstrap {
     brew install --cask qlmarkdown
   else
     printParagraph "\`qlmarkdown\` appears to be already installed."
+  fi
+
+  printSubheader "Rectangle"
+  if [[ ! $(brew ls rectangle 2>/dev/null) ]]; then
+    brew install rectangle
+  else
+    printParagraph "Rectangle appears to be already installed."
   fi
 
   if [[ :$CURRENT_PATH: != *:"$HOMEBREW_PATH":* ]]; then
