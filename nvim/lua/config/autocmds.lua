@@ -4,7 +4,5 @@
 
 -- When existing files are opened in another way than from Neotree (e.g. using Telescope), close Neotree
 vim.api.nvim_create_autocmd({ "BufReadPost" }, {
-  callback = function()
-    vim.cmd("Neotree close")
-  end,
+  command = "Neotree close",
 })
