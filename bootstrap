@@ -137,7 +137,20 @@ function nukeExistingZshConfig {
 
 function nukeExistingVimConfig {
   printParagraph ${NEOVIM_CONFIG_DIR/#$HOME/'~'}
-  [[ -d $NEOVIM_CONFIG_DIR ]] && rm -rf $NEOVIM_CONFIG_DIR || true
+  [[ -d $NEOVIM_CONFIG_DIR ]] && rm -rf $NEOVIM_CONFIG_DIR
+
+  local neovim_cache_dir="$HOME/.local/cache/nvim"
+  local neovim_data_dir="$HOME/.local/share/nvim"
+  local neovim_state_dir="$HOME/.local/state/nvim"
+
+  printParagraph ${neovim_cache_dir/#$HOME/'~'}
+  [[ -d $neovim_cache_dir ]] && rm -rf $neovim_cache_dir
+
+  printParagraph ${neovim_data_dir/#$HOME/'~'}
+  [[ -d $neovim_data_dir ]] && rm -rf $neovim_data_dir
+
+  printParagraph ${neovim_state_dir/#$HOME/'~'}
+  [[ -d $neovim_state_dir ]] && rm -rf $neovim_state_dir
 }
 
 function nukeExistingConfig {
