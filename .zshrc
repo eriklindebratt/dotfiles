@@ -1,3 +1,5 @@
+# Fix undercurl support in WezTerm
+# https://wezfurlong.org/wezterm/faq.html#how-do-i-enable-undercurl-curly-underlines
 export TERM=wezterm
 
 # If you come from bash you might have to change your $PATH.
@@ -27,9 +29,6 @@ HYPHEN_INSENSITIVE="true"
 
 # Uncomment the following line to disable bi-weekly auto-update checks.
 DISABLE_AUTO_UPDATE="true"
-
-# Uncomment the following line to automatically update without prompting.
-# DISABLE_UPDATE_PROMPT="true"
 
 # Uncomment the following line to change how often to auto-update (in days).
 # export UPDATE_ZSH_DAYS=13
@@ -107,35 +106,20 @@ SPACESHIP_PROMPT_ORDER=(
   #gcloud        # Google Cloud Platform section
   venv          # virtualenv section
   conda         # conda virtualenv section
-  pyenv         # Pyenv section
   dotnet        # .NET section
-  ember         # Ember.js section
   kubectl       # Kubectl context section
   terraform     # Terraform workspace section
   exec_time     # Execution time
   line_sep      # Line break
   #battery       # Battery level and status
-  vi_mode       # Vi-mode indicator
   jobs          # Background jobs indicator
   exit_code     # Exit code section
   char          # Prompt character
 )
 
-# export MANPATH="/usr/local/man:$MANPATH"
-
 # You may need to manually set your language environment
 export LANG=en_US.UTF-8
 export LC_ALL=$LANG
-
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
 
 setopt interactivecomments
 
