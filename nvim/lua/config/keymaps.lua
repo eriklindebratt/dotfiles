@@ -17,4 +17,7 @@ vim.cmd([[
   cnoreabbrev Noh noh
 ]])
 
+vim.keymap.del("n", "<c-_>") -- remove binding to open floating terminal
+vim.keymap.del("n", "<c-/>") -- remove binding to open floating terminal
+
 vim.keymap.set("n", "<leader>/", ":noh<CR>") -- remove search highlights
