@@ -81,8 +81,6 @@ function confirm {
   prompt="${1:-Are you sure?}"
   clearLineAfterUserInput=${2:-false}
 
-  tput bel
-
   # call with a prompt string or use a default
   read -r -p "$prompt (y/N) " response
   case "$response" in
@@ -98,7 +96,6 @@ function confirm {
 }
 
 function waitForEnterKey {
-  tput bel
   read -p "Press Enter to continue"
   clearPreviousLine
 }
@@ -186,7 +183,6 @@ function nukeExistingConfig {
     ;;
   esac
 
-  tput bel
   printHeader "🗑  All done!"
 }
 
@@ -367,6 +363,8 @@ function bootstrap {
   if [[ "$(command -v node)" != "" ]]; then
     printParagraph "\`node\` appears to be already installed, at $(which node)"
   elif [[ "$(command -v nodejs)" != "" ]]; then
+    printParagraph "\`nodejs\` appears to be already installed, at $(which nodejs)"
+  elif [[ "$(which node)" != "" ]]; then
     printParagraph "\`nodejs\` appears to be already installed, at $(which nodejs)"
   else
     printParagraph "Installing latest LTS version of Node.js"
