@@ -460,7 +460,7 @@ function bootstrap {
 
   printSubheader "GitX"
   if [[ ! "$(command -v gitx)" ]]; then
-    brew install --cask rowanj-gitx
+    brew install gitx
   else
     printParagraph "\`gitx\` appears to be already installed, at $(which gitx)"
   fi
