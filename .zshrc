@@ -187,9 +187,6 @@ eval "$(zoxide init zsh)"
 
 bindkey -s ^f "~/dev/dotfiles/tmux-pick-session\n"
 
-# enable iTerm shell integration, if such a config exists for zsh
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-
 # add paths to Google Cloud SDK
 if [ -f "$HOME/google-cloud-sdk/path.zsh.inc" ]; then . "$HOME/google-cloud-sdk/path.zsh.inc"; fi
 
