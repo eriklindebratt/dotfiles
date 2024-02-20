@@ -69,7 +69,7 @@ COMPLETION_WAITING_DOTS="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git ripgrep)
+plugins=(ripgrep)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -139,7 +139,9 @@ alias ctags="$(brew --prefix)/bin/ctags"  # prefer Homebrew version of ctags
 alias n="nvim"
 alias "n."="nvim ."
 alias "nvim."="nvim ."
-alias "nvim."="nvim ."
+alias g="git"
+alias gb="git branch"
+alias gd="git diff"
 alias gs="git s"
 alias gds="gd --staged"
 alias gba="git branch -a | fzf --ansi | cut -d ':' -f 2 | xargs echo | xargs git checkout"
