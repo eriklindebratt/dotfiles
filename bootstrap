@@ -363,26 +363,13 @@ function bootstrap {
   fi
 
   echo
-  printSubheader "Node Version Manager"
-  if [[ ! -d "$HOME/.nvm" ]]; then
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+  printSubheader "Volta (JavaScript toolchain manager)"
+  if [[ ! "$(command -v volta)" ]]; then
+    brew install volta
   else
-    printParagraph "\`nvm\` appears to be already installed"
+    printParagraph "\`volta\` appears to be already installed, at $(which volta)"
   fi
-  export NVM_DIR="$HOME/.nvm"                                       # should also be in ~/.zshrc
-  [ -s "$NVM_DIR/nvm.sh" ] && (. "$NVM_DIR/nvm.sh" || true) || true # should also be in ~/.zshrc
-
-  printSubheader "Node.js"
-  if [[ "$(command -v node)" != "" ]]; then
-    printParagraph "\`node\` appears to be already installed, at $(which node)"
-  elif [[ "$(command -v nodejs)" != "" ]]; then
-    printParagraph "\`nodejs\` appears to be already installed, at $(which nodejs)"
-  elif [[ "$(which node)" != "" ]]; then
-    printParagraph "\`nodejs\` appears to be already installed, at $(which nodejs)"
-  else
-    printParagraph "Installing latest LTS version of Node.js"
-    nvm install --lts --latest-npm
-  fi
+  volta install node
 
   printSubheader "pyenv"
   if [[ ! "$(command -v pyenv)" ]]; then
