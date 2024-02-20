@@ -158,6 +158,10 @@ case ":$PATH:" in
 esac
 # pnpm end
 
+# deno
+export DENO_INSTALL="$HOME/.deno"
+export PATH="$DENO_INSTALL/bin:$PATH"
+
 # initialize pyenv, if installed
 if [[ "$(command -v pyenv)" ]]; then
   eval "$(pyenv init -)"
