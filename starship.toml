@@ -3,3 +3,18 @@ disabled = true
 
 [nodejs]
 disabled = true
+
+[lua]
+disabled = true
+
+[python]
+disabled = true
+
+[docker_context]
+disabled = true
+
+[package]
+disabled = true
+
+[cmd_duration]
+disabled = true
