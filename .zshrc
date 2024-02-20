@@ -12,7 +12,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-#ZSH_THEME="spaceship" # Disabling this in favor or Starship prompt. Remove this later?
+#ZSH_THEME="spaceship" # Disabling this in favor or Starship prompt
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -84,40 +84,6 @@ eval "$(starship init zsh)"
 # This is mainly to ensure tmux doesn't end the session when the shell in the last window exits
 set -o ignoreeof # zsh
 export IGNOREEOF=10 # bash
-
-# SPACESHIP_PROMPT_ORDER=(
-#   time          # Time stamps section
-#   user          # Username section
-#   dir           # Current directory section
-#   host          # Hostname section
-#   git           # Git section (git_branch + git_status)
-#   hg            # Mercurial section (hg_branch  + hg_status)
-#   # package       # Package version
-#   # node          # Node.js section
-#   # ruby          # Ruby section
-#   # elixir        # Elixir section
-#   # xcode         # Xcode section
-#   # swift         # Swift section
-#   # golang        # Go section
-#   # php           # PHP section
-#   # rust          # Rust section
-#   # haskell       # Haskell Stack section
-#   # julia         # Julia section
-#   # docker        # Docker section
-#   # aws           # Amazon Web Services section
-#   # gcloud        # Google Cloud Platform section
-#   # venv          # virtualenv section
-#   # conda         # conda virtualenv section
-#   # dotnet        # .NET section
-#   # kubectl       # Kubectl context section
-#   # terraform     # Terraform workspace section
-#   exec_time     # Execution time
-#   line_sep      # Line break
-#   #battery       # Battery level and status
-#   jobs          # Background jobs indicator
-#   exit_code     # Exit code section
-#   char          # Prompt character
-# )
 
 # You may need to manually set your language environment
 export LANG=en_US.UTF-8
