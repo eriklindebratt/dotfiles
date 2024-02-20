@@ -20,6 +20,7 @@ SCRIPT_DIR="$(
 )"
 CONFIG_DIR="$HOME/.config"
 NEOVIM_CONFIG_DIR="$CONFIG_DIR/nvim"
+STARSHIP_CONFIG_PATH="$CONFIG_DIR/starship.toml"
 TMUX_CONFIG_DIR="$CONFIG_DIR/tmux"
 WTF_CONFIG_PATH="$CONFIG_DIR/wtf/config.yml"
 
@@ -298,13 +299,25 @@ function bootstrap {
   printParagraph "$POST_SHELL_SETUP_MESSAGE"
   unset RUNZSH
 
-  printSubheader "Spaceship Zsh prompt"
-  spaceshipPromptPath=$HOME/.oh-my-zsh/custom/themes/spaceship-prompt
-  if [[ ! -d $spaceshipPromptPath ]]; then
-    git clone https://github.com/denysdovhan/spaceship-prompt.git $spaceshipPromptPath --depth=1
-    ln -s "$spaceshipPromptPath/spaceship.zsh-theme" "$spaceshipPromptPath/../spaceship.zsh-theme"
+  printSubheader "Fonts for custom characters"
+  if [[ ! "$(brew ls --cask --versions font-hack-nerd-font)" ]]; then
+    brew tap homebrew/cask-fonts
+    brew install --cask font-hack-nerd-font
   else
-    printParagraph "Spaceship Zsh prompt already appears to be installed at $spaceshipPromptPath"
+    printParagraph "\`font-hack-nerd-font\` appears to be already installed"
+  fi
+
+  printSubheader "Starship prompt"
+  if [[ ! "$(command -v starship)" ]]; then
+    brew install starship
+  else
+    printParagraph "\`starship\` appears to be already installed, at $(which starship)"
+  fi
+  if [[ ! -f $STARSHIP_CONFIG_PATH ]]; then
+    printParagraph "Adding config at $STARSHIP_CONFIG_PATH"
+    cp starship.toml $STARSHIP_CONFIG_PATH
+  else
+    printParagraph "Config already present at $STARSHIP_CONFIG_PATH"
   fi
 
   printSubheader "htop"
@@ -414,14 +427,6 @@ function bootstrap {
     npm i -g install neovim
   else
     printParagraph "\`neovim\` Node.js package appears to be already installed"
-  fi
-
-  printSubheader "Fonts for custom characters"
-  if [[ ! "$(brew ls --cask --versions font-hack-nerd-font)" ]]; then
-    brew tap homebrew/cask-fonts
-    brew install --cask font-hack-nerd-font
-  else
-    printParagraph "\`font-hack-nerd-font\` appears to be already installed"
   fi
 
   printSubheader "Neovim configs"

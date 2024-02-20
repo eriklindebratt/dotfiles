@@ -12,6 +12,7 @@ SCRIPT_DIR="$(
   pwd -P
 )"
 NEOVIM_CONFIG_PATH=~/.config/nvim
+STARSHIP_CONFIG_PATH=~/.config/starship.toml
 TMUX_CONFIG_PATH=~/.config/tmux/tmux.conf
 WTF_CONFIG_PATH=~/.config/wtf/config.yml
 
@@ -90,6 +91,15 @@ function collect {
 
   printSubheader "Neovim and its plugins"
   [[ -d $NEOVIM_CONFIG_PATH ]] && cp -r $NEOVIM_CONFIG_PATH $SCRIPT_DIR/
+
+  ################################################
+
+  printSubheader "Starship prompt config"
+  if [[ -f $STARSHIP_CONFIG_PATH ]]; then
+    cp $STARSHIP_CONFIG_PATH $SCRIPT_DIR/
+  else
+    printParagraph "$STARSHIP_CONFIG_PATH doesn't exist"
+  fi
 
   ################################################
 
