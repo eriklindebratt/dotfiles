@@ -3,33 +3,36 @@
 if [[ $# -eq 1 ]]; then
   selected=$1
 else
-  config_dirs=("~/.config/nvim" "~/.config/tmux")
-  all_dirs=(${config_dirs[@]} $(find ~/dev -mindepth 1 -maxdepth 1 -type d))
+  config_dirs=("${HOME}/.config/nvim" "${HOME}/.config/tmux")
+  playground_dir="${HOME}/dev/playground"
+  playground_dirs=$(find "${playground_dir}" -mindepth 1 -maxdepth 1 -type d)
+  other_dirs=$(find "${HOME}/dev" -mindepth 1 -maxdepth 1 -type d ! -path "${playground_dir}")
+  all_dirs=("${config_dirs[@]}" "${playground_dirs[@]}" "${other_dirs[@]}")
 
-  selected=$(printf "%s\n" ${all_dirs[@]} | sed "s|$HOME|~|" | fzf)
+  selected=$(printf "%s\n" "${all_dirs[@]}" | sed "s|$HOME|~|" | fzf)
 fi
 
-if [[ -z $selected ]]; then
+if [[ -z ${selected} ]]; then
   exit 0
 fi
 
-selected_abs_path=$(echo $selected | sed "s|~|$HOME|")
+selected_abs_path=$(echo "$selected" | sed "s|~|$HOME|")
 selected_parent_name="$(basename $(dirname $selected) | tr . _ | sed 's/_//')"
-selected_name=$(basename "$selected_abs_path" | tr . _)
-if [[ ! -z $selected_parent_name ]]; then
-  selected_name=${selected_parent_name}/$selected_name
+selected_name=$(basename "${selected_abs_path}" | tr . _)
+if [[ -n ${selected_parent_name} ]]; then
+  selected_name="${selected_parent_name}/${selected_name}"
 fi
-tmux_running=$(pgrep tmux)
+# tmux_running=$(pgrep tmux)
 
-if ! tmux has-session -t=$selected_name 2>/dev/null; then
-  tmux new-session -ds $selected_name -c $selected_abs_path
+if ! tmux has-session -t="${selected_name}" 2>/dev/null; then
+  tmux new-session -ds "${selected_name}" -c "${selected_abs_path}"
 
-  while ! tmux has-session -t=$selected_name; do sleep 0.05; done
-  tmux new-window -dt $selected_name: -c $selected_abs_path
+  while ! tmux has-session -t="${selected_name}"; do sleep 0.05; done
+  tmux new-window -dt "${selected_name}": -c "${selected_abs_path}"
 fi
 
-if [[ -z $TMUX ]]; then
-  tmux attach-session -t $selected_name
+if [[ -z ${TMUX} ]]; then
+  tmux attach-session -t "${selected_name}"
 else
-  tmux switch-client -t $selected_name
+  tmux switch-client -t "${selected_name}"
 fi
