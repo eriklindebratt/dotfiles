@@ -28,9 +28,12 @@ return {
       path_display = filename_first,
       dynamic_preview_title = true,
       layout_config = {
-        width = 0.9,
-        preview_width = 0.4,
+        horizontal = {
+          width = 0.9,
+          preview_width = 0.4,
+        },
       },
+      layout_strategy = "horizontal",
     },
     pickers = {
       find_files = {
