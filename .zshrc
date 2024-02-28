@@ -110,11 +110,7 @@ alias gb="git branch"
 alias gd="git diff"
 alias gs="git s"
 alias gds="gd --staged"
-alias gba="git branch -a | fzf --ansi | cut -d ':' -f 2 | xargs echo | xargs git checkout"
-
-# volta
-export VOLTA_HOME="$HOME/.volta"
-export PATH="$VOLTA_HOME/bin:$PATH"
+alias gba="git branch -a | fzf --ansi | cut -d ':' -f 2 | xargs echo | sed -E 's/^(remotes\/[^\/]+\/)//' | xargs git checkout"
 
 # pnpm
 export PNPM_HOME="$HOME/Library/pnpm"
@@ -154,9 +150,16 @@ function mcd() {
   cd $1
 }
 
+function make_day_note() {
+  formatted_date=$(date +"%Y-%m-%d")
+  filename="${formatted_date}.md"
+  nvim "${filename}"
+}
+
 # initialize zoxide
 eval "$(zoxide init zsh)"
 
+# keybindings/shortcuts
 bindkey -s ^f "~/dev/dotfiles/tmux-pick-session\n"
 
 # add paths to Google Cloud SDK
@@ -164,3 +167,7 @@ if [ -f "$HOME/google-cloud-sdk/path.zsh.inc" ]; then . "$HOME/google-cloud-sdk/
 
 # add zsh command completion for Google Cloud CLI
 if [ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/google-cloud-sdk/completion.zsh.inc"; fi
+
+# volta
+export VOLTA_HOME="$HOME/.volta"
+export PATH="$VOLTA_HOME/bin:$PATH"
