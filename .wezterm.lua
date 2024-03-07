@@ -12,7 +12,18 @@ end
 
 -- This is where you actually apply your config choices
 
-config.color_scheme = "tokyonight"
+local function get_appearance()
+  if wezterm.gui then
+    return wezterm.gui.get_appearance()
+  end
+  return "Dark"
+end
+if get_appearance():find("Dark") then
+  config.color_scheme = "Tokyo Night Moon"
+else
+  config.color_scheme = "Tokyo Night Day"
+end
+
 config.check_for_updates = true
 config.enable_tab_bar = false
 config.font_size = 16
@@ -38,7 +49,7 @@ config.window_decorations = "RESIZE" -- See also "INTEGRATED_BUTTONS|RESIZE"
 
 -- Start WezTerm maximized
 wezterm.on("gui-startup", function()
-  local tab, pane, window = wezterm.mux.spawn_window({})
+  local _tab, _pane, window = wezterm.mux.spawn_window({})
   window:gui_window():maximize()
 end)
 
