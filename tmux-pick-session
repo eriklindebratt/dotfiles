@@ -9,7 +9,7 @@ else
   other_dirs=$(find "${HOME}/dev" -mindepth 1 -maxdepth 1 -type d ! -path "${playground_dir}")
   all_dirs=("${config_dirs[@]}" "${playground_dirs[@]}" "${other_dirs[@]}")
 
-  selected=$(printf "%s\n" "${all_dirs[@]}" | sed "s|$HOME|~|" | sed "/^$/d" | sort --reverse | fzf)
+  selected=$(printf "%s\n" "${all_dirs[@]}" | sed "s|$HOME|~|" | sed "/^$/d" | sort --reverse | fzf --color=bw)
 fi
 
 if [[ -z ${selected} ]]; then

@@ -132,8 +132,14 @@ fi
 # global grep options
 export GREP_OPTIONS='-iI --color --exclude-dir=.git'
 
-# configure fuzzy finder to use ripgrep
+# fuzzy finder options
+# - use ripgrep for file search (using its `--files` flag), tell it to:
+#   - `--follow`: follow symbolic links
+#   - `--hidden: `include "hidden" files
+#   - `--no-ignore-vcs`: ignore VCS ignore files
 export FZF_DEFAULT_COMMAND='rg --files --follow --hidden --no-ignore-vcs'
+# - `--color=bw`: don't use colors since they don't respect the terminal's colorscheme
+export FZF_DEFAULT_OPTS='--color=bw'
 
 # path to NeoVim log file
 export NVIM_LOG_FILE=~/.cache/nvim/log
