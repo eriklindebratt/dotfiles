@@ -13,7 +13,7 @@ SCRIPT_DIR="$(
 )"
 NEOVIM_CONFIG_PATH=~/.config/nvim
 STARSHIP_CONFIG_PATH=~/.config/starship.toml
-TMUX_CONFIG_PATH=~/.config/tmux/tmux.conf
+TMUX_CONFIG_PATHS=(~/.config/tmux/tmux.conf ~/.config/tmux/themes)
 WTF_CONFIG_PATH=~/.config/wtf/config.yml
 
 STYLE_RESET=$(printf '\e[0m')
@@ -104,9 +104,11 @@ function collect {
   ################################################
 
   printSubheader "tmux configuration"
-  if [[ -f $TMUX_CONFIG_PATH ]]; then
+  if [[ -f $TMUX_CONFIG_PATHS ]]; then
     [ ! -d $SCRIPT_DIR/tmux ] && mkdir $SCRIPT_DIR/tmux
-    cp -r $TMUX_CONFIG_PATH $SCRIPT_DIR/tmux/tmux.conf
+    for path in "${TMUX_CONFIG_PATHS[@]}"; do
+      cp -r "${path}" "${SCRIPT_DIR}/tmux/"
+    done
   fi
 
   ################################################

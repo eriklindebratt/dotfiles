@@ -434,11 +434,11 @@ function bootstrap {
     printParagraph "\`tmux\` appears to be already installed, at $(which tmux)"
   fi
   printParagraph "Adding config files"
-  [[ ! -d $TMUX_CONFIG_DIR ]] && mkdir -p $TMUX_CONFIG_DIR
-  cp -r $SCRIPT_DIR/tmux $TMUX_CONFIG_DIR/../
-  if [[ ! -d $TMUX_CONFIG_DIR/plugins ]]; then
+  [[ ! -d ${TMUX_CONFIG_DIR} ]] && mkdir -p "${TMUX_CONFIG_DIR}"
+  cp -r "${SCRIPT_DIR}/tmux" "${TMUX_CONFIG_DIR}/../"
+  if [[ ! -d ${TMUX_CONFIG_DIR}/plugins ]]; then
     printParagraph "Installing tpm"
-    git clone https://github.com/tmux-plugins/tpm $TMUX_CONFIG_DIR/plugins/tpm
+    git clone https://github.com/tmux-plugins/tpm "${TMUX_CONFIG_DIR}/plugins/tpm"
   else
     printParagraph "tpm appears to be already installed"
   fi
