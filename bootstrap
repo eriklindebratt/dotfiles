@@ -545,6 +545,20 @@ function bootstrap {
     printParagraph "Rectangle appears to be already installed."
   fi
 
+  printSubheader "BetterDisplay"
+  if [[ ! $(brew ls betterdisplay 2>/dev/null) ]]; then
+    brew install betterdisplay
+  else
+    printParagraph "BetterDisplay appears to be already installed."
+  fi
+
+  printSubheader "Gitify"
+  if [[ ! $(brew ls gitify 2>/dev/null) ]]; then
+    brew install gitify
+  else
+    printParagraph "Gitify appears to be already installed."
+  fi
+
   if [[ :$CURRENT_PATH: != *:"$HOMEBREW_PATH":* ]]; then
     # this will likely get modified by user from ~/.zshrc later
     # but it's to ensure that some bare minimum paths are added
