@@ -1,5 +1,3 @@
-local Util = require("lazyvim.util")
-
 return {
   "nvim-lualine/lualine.nvim",
   event = "VeryLazy",
@@ -33,7 +31,7 @@ return {
         lualine_b = { "branch" },
 
         lualine_c = {
-          Util.lualine.root_dir(),
+          LazyVim.lualine.root_dir(),
           {
             "diagnostics",
             symbols = {
@@ -45,7 +43,7 @@ return {
           },
           { "filetype" },
           { "fileformat" },
-          { Util.lualine.pretty_path() },
+          { LazyVim.lualine.pretty_path() },
           {
             function()
               return require("nvim-navic").get_location()
@@ -60,24 +58,24 @@ return {
           {
             function() return require("noice").api.status.command.get() end,
             cond = function() return package.loaded["noice"] and require("noice").api.status.command.has() end,
-            color = Util.ui.fg("Statement"),
+            color = LazyVim.ui.fg("Statement"),
           },
           -- stylua: ignore
           {
             function() return require("noice").api.status.mode.get() end,
             cond = function() return package.loaded["noice"] and require("noice").api.status.mode.has() end,
-            color = Util.ui.fg("Constant"),
+            color = LazyVim.ui.fg("Constant"),
           },
           -- stylua: ignore
           {
             function() return "  " .. require("dap").status() end,
             cond = function () return package.loaded["dap"] and require("dap").status() ~= "" end,
-            color = Util.ui.fg("Debug"),
+            color = LazyVim.ui.fg("Debug"),
           },
           {
             require("lazy.status").updates,
             cond = require("lazy.status").has_updates,
-            color = Util.ui.fg("Special"),
+            color = LazyVim.ui.fg("Special"),
           },
           {
             "diff",

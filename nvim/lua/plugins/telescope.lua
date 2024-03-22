@@ -1,5 +1,3 @@
-local Util = require("lazyvim.util")
-
 -- https://github.com/nvim-telescope/telescope.nvim/issues/2014#issuecomment-1873547633
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "TelescopeResults",
@@ -45,7 +43,7 @@ return {
     { "<leader>/", false }, -- disable the keymap to grep files (we use the same mapping elsewhere)
     {
       "<C-p>",
-      Util.telescope("files"),
+      LazyVim.telescope("files"),
       desc = "Find Files (root dir)",
     },
   },
