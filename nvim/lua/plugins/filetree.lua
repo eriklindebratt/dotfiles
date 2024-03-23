@@ -35,5 +35,8 @@ return {
         },
       },
     },
+    -- Give `init` an empty function, disabling the default behavior of
+    -- Neo-tree opening up when Neovim opened with a directory as argument
+    init = function() end,
   },
 }

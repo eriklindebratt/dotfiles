@@ -15,3 +15,6 @@ vim.opt.listchars = "tab:▸ ,trail:·,nbsp:␣,extends:❯,precedes:❮"
 -- To disable root detection set to just "cwd".
 -- This will prevent Neovim from auto-switching current working directory.
 vim.g.root_spec = { "cwd" }
+
+-- Disable Netrw by tricking Vim into thinking it's already loaded
+vim.g.loaded_netrwPlugin = 1
