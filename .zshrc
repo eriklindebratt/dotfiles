@@ -111,6 +111,8 @@ alias gd="git diff"
 alias gs="git s"
 alias gds="gd --staged"
 alias gba="git branch -a | fzf --ansi | cut -d ':' -f 2 | xargs echo | sed -E 's/^(remotes\/[^\/]+\/)//' | xargs git checkout"
+alias toggle_macos_dark_mode="osascript -e 'tell app \"System Events\" to tell appearance preferences to set dark mode to not dark mode'"
+
 
 # pnpm
 export PNPM_HOME="$HOME/Library/pnpm"
