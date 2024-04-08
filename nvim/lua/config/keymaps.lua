@@ -27,3 +27,8 @@ vim.api.nvim_create_user_command("Rfinder", function()
   local path = vim.api.nvim_buf_get_name(0)
   os.execute("open -R " .. path)
 end, {})
+
+vim.keymap.set("n", "<leader>gb", function()
+  local current_git_branch = vim.fn.system("git branch | grep -E '^\\* ' | cut -d '*' -f 2 | xargs echo")
+  vim.notify(current_git_branch, "info", { title = "Current Git branch", timeout = 6000 })
+end, { desc = "Show current Git branch" })
