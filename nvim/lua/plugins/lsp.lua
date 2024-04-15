@@ -10,6 +10,7 @@ return {
         "bash-language-server",
         "black",
         "css-lsp",
+        "deno",
         "dockerfile-language-server",
         "eslint-lsp",
         "gopls",
