@@ -21,6 +21,9 @@ end
 
 return {
   "nvim-telescope/telescope.nvim",
+  config = {
+    require("telescope").load_extension("package_info"),
+  },
   opts = {
     defaults = {
       path_display = filename_first,

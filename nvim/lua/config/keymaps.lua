@@ -32,3 +32,40 @@ vim.keymap.set("n", "<leader>gb", function()
   local current_git_branch = vim.fn.system("git branch | grep -E '^\\* ' | cut -d '*' -f 2 | xargs echo")
   vim.notify(current_git_branch, "info", { title = "Current Git branch", timeout = 6000 })
 end, { desc = "Show current Git branch" })
+
+-- package-info.nvim
+-- Toggle version status info
+vim.keymap.set(
+  { "n" },
+  "<leader>cpp",
+  require("package-info").toggle,
+  { silent = true, noremap = true, desc = "Toggle version status" }
+)
+-- Update dependency on current line
+vim.keymap.set(
+  { "n" },
+  "<leader>cpu",
+  require("package-info").update,
+  { silent = true, noremap = true, desc = "Update dependency" }
+)
+-- Delete/uninstall dependency on current line
+vim.keymap.set(
+  { "n" },
+  "<leader>cpd",
+  require("package-info").delete,
+  { silent = true, noremap = true, desc = "Delete/uninstall dependency" }
+)
+-- Add new dependency
+vim.keymap.set(
+  { "n" },
+  "<leader>cpa",
+  require("package-info").install,
+  { silent = true, noremap = true, desc = "Add new dependency" }
+)
+-- Install different version of dependency on current line
+vim.keymap.set(
+  { "n" },
+  "<leader>cpc",
+  require("package-info").change_version,
+  { silent = true, noremap = true, desc = "Change dependency version" }
+)
