@@ -362,7 +362,6 @@ function bootstrap {
     printParagraph "\`ctags\` appears to be already installed, at $(brew --prefix ctags)"
   fi
 
-  echo
   printSubheader "Volta (JavaScript toolchain manager)"
   if [[ ! "$(command -v volta)" ]]; then
     brew install volta
@@ -370,6 +369,13 @@ function bootstrap {
     printParagraph "\`volta\` appears to be already installed, at $(which volta)"
   fi
   volta install node
+
+  printSubheader "Deno"
+  if [[ ! "$(command -v deno)" ]]; then
+    brew install deno
+  else
+    printParagraph "\`deno\` appears to be already installed, at $(which deno)"
+  fi
 
   printSubheader "pyenv"
   if [[ ! "$(command -v pyenv)" ]]; then
