@@ -113,7 +113,6 @@ alias gds="gd --staged"
 alias gba="git branch -a | fzf --ansi | cut -d ':' -f 2 | xargs echo | sed -E 's/^(remotes\/[^\/]+\/)//' | xargs git checkout"
 alias toggle_macos_dark_mode="osascript -e 'tell app \"System Events\" to tell appearance preferences to set dark mode to not dark mode'"
 
-
 # pnpm
 export PNPM_HOME="$HOME/Library/pnpm"
 case ":$PATH:" in
@@ -121,10 +120,6 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
-
-# deno
-export DENO_INSTALL="$HOME/.deno"
-export PATH="$DENO_INSTALL/bin:$PATH"
 
 # initialize pyenv, if installed
 if [[ "$(command -v pyenv)" ]]; then
@@ -162,6 +157,14 @@ function make_day_note() {
   formatted_date=$(date +"%Y-%m-%d")
   filename="${formatted_date}.md"
   nvim "${filename}"
+}
+
+function check_port_used() {
+  port="$1"
+  if [[ -z "${port}" ]]; then
+    echo "Usage: check_port_used <port>" && return 1
+  fi
+  lsof -nP -iTCP -sTCP:LISTEN | grep "${port}"
 }
 
 # initialize zoxide
