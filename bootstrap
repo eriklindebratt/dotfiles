@@ -300,9 +300,8 @@ function bootstrap {
   unset RUNZSH
 
   printSubheader "Fonts for custom characters"
-  if [[ ! "$(brew ls --cask --versions font-hack-nerd-font)" ]]; then
-    brew tap homebrew/cask-fonts
-    brew install --cask font-hack-nerd-font
+  if [[ ! "$(brew ls font-hack-nerd-font)" ]]; then
+    brew install font-hack-nerd-font
   else
     printParagraph "\`font-hack-nerd-font\` appears to be already installed"
   fi
