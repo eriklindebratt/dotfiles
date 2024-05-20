@@ -18,3 +18,6 @@ vim.g.root_spec = { "cwd" }
 
 -- Disable Netrw by tricking Vim into thinking it's already loaded
 vim.g.loaded_netrwPlugin = 1
+
+-- Show deprecation warnings
+vim.g.deprecation_warnings = true
