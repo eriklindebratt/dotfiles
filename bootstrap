@@ -361,13 +361,32 @@ function bootstrap {
     printParagraph "\`ctags\` appears to be already installed, at $(brew --prefix ctags)"
   fi
 
-  printSubheader "Volta (JavaScript toolchain manager)"
-  if [[ ! "$(command -v volta)" ]]; then
-    brew install volta
+  printSubheader "asdf (https://asdf-vm.com/)"
+  if [[ ! "$(which asdf)" ]]; then
+    printParagraph "Installing latest version off of main branch"
+    git clone https://github.com/asdf-vm/asdf.git ~/.asdf
+    source "$HOME/.asdf/asdf.sh"
   else
-    printParagraph "\`volta\` appears to be already installed, at $(which volta)"
+    printParagraph "\`asdf\` appears to be already installed, at $(which asdf)"
   fi
-  volta install node
+  if [[ ! $(asdf plugin list | grep nodejs) ]]; then
+    printParagraph "Installing asdf plugin \`nodejs\`"
+    asdf plugin add nodejs
+  fi
+  if [[ ! $(asdf plugin list | grep pnpm) ]]; then
+    printParagraph "Installing asdf plugin \`pnpm\`"
+    asdf plugin add pnpm
+  fi
+  if [[ ! $(asdf which node 2>/dev/null) ]]; then
+    printParagraph "Installing latest version of Node.js"
+    asdf install nodejs latest
+    asdf global nodejs latest
+  fi
+  if [[ ! $(asdf which pnpm 2>/dev/null) ]]; then
+    printParagraph "Installing latest version of pnpm"
+    asdf install pnpm latest
+    asdf global pnpm latest
+  fi
 
   printSubheader "Deno"
   if [[ ! "$(command -v deno)" ]]; then
@@ -416,7 +435,7 @@ function bootstrap {
 
   printSubheader "Neovim Node.js provider"
   if ! $(node -e "require('neovim')" 2>/dev/null); then
-    npm i -g install neovim
+    npm i -g neovim
   else
     printParagraph "\`neovim\` Node.js package appears to be already installed"
   fi
