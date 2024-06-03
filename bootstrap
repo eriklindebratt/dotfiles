@@ -387,6 +387,7 @@ function bootstrap {
     asdf install pnpm latest
     asdf global pnpm latest
   fi
+  source "$HOME/.asdf/asdf.sh"
 
   printSubheader "Deno"
   if [[ ! "$(command -v deno)" ]]; then
