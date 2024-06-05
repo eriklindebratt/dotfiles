@@ -24,7 +24,7 @@ return {
         "pyright",
         "tailwindcss-language-server",
         "tflint",
-        "typescript-language-server",
+        "vtsls",
         "shellcheck",
         "stylelint",
         "svelte-language-server",
