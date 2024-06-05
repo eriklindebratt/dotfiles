@@ -6,3 +6,13 @@
 vim.api.nvim_create_autocmd({ "BufReadPost" }, {
   command = "Neotree close",
 })
+
+vim.api.nvim_create_autocmd({ "BufEnter" }, {
+  callback = function(ev)
+    if vim.api.nvim_buf_is_valid(ev.buf) and vim.bo[ev.buf].buftype == "" then
+      pcall(function()
+        vim.cmd("TroubleRefresh")
+      end)
+    end
+  end,
+})
