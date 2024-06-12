@@ -46,7 +46,7 @@ return {
     { "<leader>/", false }, -- disable the keymap to grep files (we use the same mapping elsewhere)
     {
       "<C-p>",
-      LazyVim.telescope("files"),
+      LazyVim.pick("find_files", { hidden = true }),
       desc = "Find Files (root dir)",
     },
   },
