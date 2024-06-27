@@ -67,7 +67,6 @@ return {
           "black",
           "css-lsp",
           "css-variables-language-server",
-          "deno",
           "dockerfile-language-server",
           "eslint-lsp",
           "gopls",
