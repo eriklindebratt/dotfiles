@@ -339,12 +339,10 @@ function bootstrap {
   else
     printParagraph "\`rg\` appears to be already installed, at $(which rg)"
   fi
-  if [[ ! -f ~/.rgignore ]]; then
-    printParagraph "Adding ~/.rgignore"
-    cp $SCRIPT_DIR/.rgignore_global ~/.rgignore
-  else
-    printParagraph "~/.rgignore already exists"
-  fi
+  printParagraph "Adding ~/.rgignore"
+  cp $SCRIPT_DIR/.rgignore_global ~/.rgignore
+  printParagraph "Adding ~/.ripgreprc"
+  cp $SCRIPT_DIR/.ripgreprc ~/.ripgreprc
 
   printSubheader "fd"
   if [[ ! "$(command -v fd)" ]]; then

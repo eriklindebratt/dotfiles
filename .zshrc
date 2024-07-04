@@ -138,6 +138,8 @@ export FZF_DEFAULT_COMMAND='rg --files --follow --hidden --no-ignore-vcs'
 # - `--color=bw`: don't use colors since they don't respect the terminal's colorscheme
 export FZF_DEFAULT_OPTS='--color=bw'
 
+export RIPGREP_CONFIG_PATH="${HOME}/.ripgreprc"
+
 # path to NeoVim log file
 export NVIM_LOG_FILE=~/.cache/nvim/log
 

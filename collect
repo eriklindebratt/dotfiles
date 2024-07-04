@@ -157,6 +157,12 @@ function collect {
   else
     printParagraph "~/.rgignore doesn't exist"
   fi
+  if [[ -f ~/.ripgreprc ]]; then
+    printParagraph "~/.ripgreprc"
+    cp ~/.ripgreprc $SCRIPT_DIR/.ripgreprc
+  else
+    printParagraph "~/.ripgreprc doesn't exist"
+  fi
 
   printSubheader "WTF Terminal Dashboard"
   if [[ -f $WTF_CONFIG_PATH ]]; then
