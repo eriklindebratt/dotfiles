@@ -35,6 +35,11 @@ end, { desc = "Show current Git branch" })
 
 -- package-info.nvim
 -- Toggle version status info
+local wk = require("which-key")
+wk.add({
+  buffer = true,
+  { "<leader>cp", group = "package info" },
+})
 vim.keymap.set(
   { "n" },
   "<leader>cpp",
