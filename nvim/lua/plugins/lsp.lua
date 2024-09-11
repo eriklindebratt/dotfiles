@@ -48,7 +48,10 @@ return {
                 -- Setting `root_dir` to `nil `will prevent the LSP client from attaching to a buffer - but only if `single_file_support = false`
                 return nil
               end
-              return require("lspconfig.util").root_pattern("package.json")(filename)
+
+              local root_pattern = require("lspconfig.util").root_pattern
+              local get_root = root_pattern("pnpm-lock.yaml", "package-lock.json", "package.json")
+              return get_root(filename)
             end
           end,
         },
