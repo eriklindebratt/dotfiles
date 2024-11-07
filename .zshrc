@@ -112,6 +112,7 @@ alias gs="git s"
 alias gds="gd --staged"
 alias gba="git branch -a | fzf --ansi | cut -d ':' -f 2 | xargs echo | sed -E 's/^(remotes\/[^\/]+\/)//' | xargs git checkout"
 alias toggle_macos_dark_mode="osascript -e 'tell app \"System Events\" to tell appearance preferences to set dark mode to not dark mode'"
+alias edit_day_note="view_day_note"
 
 # pnpm
 export PNPM_HOME="$HOME/Library/pnpm"
@@ -158,6 +159,16 @@ function mcd() {
 function make_day_note() {
   formatted_date=$(date +"%Y-%m-%d")
   filename="${formatted_date}.md"
+  nvim "${filename}"
+}
+
+function view_day_note() {
+  formatted_date=$(date +"%Y-%m-%d")
+  filename="${formatted_date}.md"
+  if [[ ! -f ${filename} ]]; then
+    echo "Couldn't find a day note for the current date (${formatted_date})"
+    return 1
+  fi
   nvim "${filename}"
 }
 
