@@ -20,7 +20,7 @@ return {
       ["graphql"] = { "prettier" },
       ["handlebars"] = { "prettier" },
       ["lua"] = { "stylua" },
-      ["python"] = { "black" },
+      ["python"] = { "autopep8" },
     },
   },
 }
