@@ -21,3 +21,6 @@ vim.g.loaded_netrwPlugin = 1
 
 -- Show deprecation warnings
 vim.g.deprecation_warnings = true
+
+-- Disable all animations
+vim.g.snacks_animate = false
