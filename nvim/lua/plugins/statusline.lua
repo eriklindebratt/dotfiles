@@ -29,7 +29,6 @@ return {
       sections = {
         lualine_a = { "mode" },
         lualine_b = {},
-
         lualine_c = {
           LazyVim.lualine.root_dir(),
           {
@@ -41,8 +40,6 @@ return {
               hint = icons.diagnostics.Hint,
             },
           },
-          { "filetype" },
-          { "fileformat" },
           { LazyVim.lualine.pretty_path() },
           {
             function()
@@ -54,6 +51,25 @@ return {
           },
         },
         lualine_x = {
+          { "filetype" },
+          {
+            function()
+              local buf_clients = LazyVim.lsp.get_clients({ bufnr = 0 })
+              if next(buf_clients) == nil then
+                return ""
+              end
+              local client_names = {}
+              for _, client in ipairs(buf_clients) do
+                table.insert(client_names, client.name)
+              end
+              return table.concat(client_names, " • ")
+            end,
+          },
+          { "fileformat" },
+          {
+            "encoding",
+            show_bomb = true, -- Indicate when the file has a byte-order mark
+          },
           -- stylua: ignore
           {
             function() return require("noice").api.status.command.get() end,
