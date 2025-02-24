@@ -13,6 +13,7 @@ SCRIPT_DIR="$(
 )"
 NEOVIM_CONFIG_PATH=~/.config/nvim
 STARSHIP_CONFIG_PATH=~/.config/starship.toml
+GHOSTTY_CONFIG_PATH=~/.config/ghostty/config
 TMUX_CONFIG_PATHS=(~/.config/tmux/tmux.conf ~/.config/tmux/themes)
 WTF_CONFIG_PATH=~/.config/wtf/config.yml
 
@@ -84,8 +85,12 @@ function collect {
 
   ################################################
 
-  printSubheader "WezTerm"
-  [[ -f ~/.wezterm.lua ]] && cp -r ~/.wezterm.lua $SCRIPT_DIR/
+  printSubheader "Ghostty config"
+  if [[ -f $GHOSTTY_CONFIG_PATH ]]; then
+    cp $GHOSTTY_CONFIG_PATH $SCRIPT_DIR/ghostty-config
+  else
+    printParagraph "$GHOSTTY_CONFIG_PATH doesn't exist"
+  fi
 
   ################################################
 

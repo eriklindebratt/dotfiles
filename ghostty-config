@@ -1,0 +1,15 @@
+# Run `ghostty +show-config --default --docs` to view a list of
+# all available config options and their default values.
+#
+# Additionally, each config option is also explained in detail
+# on Ghostty's website, at https://ghostty.org/docs/config.
+
+font-family = Menlo
+font-size = 16
+window-padding-x = 10
+window-padding-y = 10
+macos-titlebar-style = hidden
+theme = light:tokyonight-day,dark:tokyonight_moon
+cursor-style = block
+cursor-style-blink = false
+shell-integration-features = no-cursor

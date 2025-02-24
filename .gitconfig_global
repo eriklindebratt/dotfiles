@@ -36,7 +36,7 @@
   colorMoved = default
 [diff "image"]
   command = ~/bin/git_img_diff
-  textconv = imgcat
+  textconv = kitty icat
 [interactive]
   diffFilter = delta --color-only
 [delta]
