@@ -1,7 +1,3 @@
-# Fix undercurl support in WezTerm
-# https://wezfurlong.org/wezterm/faq.html#how-do-i-enable-undercurl-curly-underlines
-export TERM=wezterm
-
 # If you come from bash you might have to change your $PATH.
 export PATH=$HOME/bin:/usr/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin:$PATH
 

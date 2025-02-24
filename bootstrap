@@ -21,6 +21,7 @@ SCRIPT_DIR="$(
 CONFIG_DIR="$HOME/.config"
 NEOVIM_CONFIG_DIR="$CONFIG_DIR/nvim"
 STARSHIP_CONFIG_PATH="$CONFIG_DIR/starship.toml"
+GHOSTTY_CONFIG_PATH="$CONFIG_DIR/ghostty/config"
 TMUX_CONFIG_DIR="$CONFIG_DIR/tmux"
 WTF_CONFIG_PATH="$CONFIG_DIR/wtf/config.yml"
 
@@ -251,20 +252,15 @@ function bootstrap {
     printParagraph "\`brew\` appears to be already installed, at $(which brew)"
   fi
 
-  printSubheader "WezTerm"
-  if [[ ! "$(command -v wezterm)" ]]; then
-    brew install wezterm
+  printSubheader "Ghostty"
+  if [[ ! "$(command -v ghostty)" ]]; then
+    brew install ghostty
   else
-    printParagraph "\`wezterm\` appears to be already installed, at $(which wezterm)"
+    printParagraph "\`ghostty\` appears to be already installed, at $(which ghostty)"
   fi
-  printParagraph "Adding WezTerm config"
-  cp $SCRIPT_DIR/.wezterm.lua ~/.wezterm.lua
-  # https://wezfurlong.org/wezterm/faq.html?h=undercurl#how-do-i-enable-undercurl-curly-underlines
-  printParagraph "Adding WezTerm terminfo (fixing e.g. undercurl support for Neovim)"
-  tempfile=$(mktemp)
-  curl -fsSLo $tempfile https://raw.githubusercontent.com/wez/wezterm/master/termwiz/data/wezterm.terminfo
-  tic -x -o ~/.terminfo $tempfile
-  rm $tempfile
+  printParagraph "Adding Ghostty config"
+  [[ ! -d $(dirname $GHOSTTY_CONFIG_PATH) ]] && mkdir -p $(dirname $GHOSTTY_CONFIG_PATH)
+  cp $SCRIPT_DIR/ghostty-config $GHOSTTY_CONFIG_PATH
 
   printSubheader "zsh"
   if [[ ! "$(command -v zsh)" ]]; then
