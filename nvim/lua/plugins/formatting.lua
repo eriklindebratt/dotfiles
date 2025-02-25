@@ -21,6 +21,14 @@ return {
       ["handlebars"] = { "prettier" },
       ["lua"] = { "stylua" },
       ["python"] = { "autopep8" },
+      ["erlang"] = { "erlfmt" },
+    },
+    formatters = {
+      erlfmt = {
+        command = "rebar3",
+        args = { "fmt", "$FILENAME" },
+        stdin = false,
+      },
     },
   },
 }
