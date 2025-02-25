@@ -495,6 +495,13 @@ function bootstrap {
   else
     printParagraph "~/.gitconfig already exists"
   fi
+  if [[ ! -f ~/bin/git_img_diff ]]; then
+    printParagraph "Adding ~/bin/git_img_diff"
+    [[ ! -d ~/bin ]] && mkdir -p ~/bin
+    cp $SCRIPT_DIR/git_img_diff ~/bin/git_img_diff
+  else
+    printParagraph "~/bin/git_img_diff already exists"
+  fi
   if [[ "$(git config --global user.name)" == "" ]]; then
     printf "\n  Full name to use for Git: "
     read globalGitUserName
