@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -e
+
+if [[ -f "$1" ]] && [[ -f "$2" ]]; then
+  echo "Diffing:"
+  echo "  - $2"
+  echo "  - $1"
+  compare "$2" "$1" png:- | montage -geometry +4+4 "$2" - "$1" png:- | kitty icat
+else
+  if [[ -f "$1" ]]; then
+    echo "+ Image Added: $1"
+    kitty icat "$1"
+  else
+    echo "- Image Removed: $1"
+    kitty icat "$2"
+  fi
+fi

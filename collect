@@ -144,6 +144,12 @@ function collect {
   else
     printParagraph "~/.gitattributes doesn't exist"
   fi
+  if [[ -f ~/bin/git_img_diff ]]; then
+    printParagraph "~/bin/git_img_diff"
+    cp ~/bin/git_img_diff $SCRIPT_DIR/git_img_diff
+  else
+    printParagraph "~/bin/git_img_diff doesn't exist"
+  fi
 
   ################################################
 
