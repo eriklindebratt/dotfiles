@@ -252,7 +252,7 @@ function bootstrap {
     printParagraph "\`brew\` appears to be already installed, at $(which brew)"
   fi
 
-  printSubheader "Ghostty"
+  printSubheader "Ghostty terminal"
   if [[ ! "$(command -v ghostty)" ]]; then
     brew install ghostty
   else
@@ -261,6 +261,14 @@ function bootstrap {
   printParagraph "Adding Ghostty config"
   [[ ! -d $(dirname $GHOSTTY_CONFIG_PATH) ]] && mkdir -p $(dirname $GHOSTTY_CONFIG_PATH)
   cp $SCRIPT_DIR/ghostty-config $GHOSTTY_CONFIG_PATH
+
+  printSubheader "Kitty terminal"
+  printParagraph "Mainly used for the Kitty image protocol to render images in the terminal"
+  if [[ ! "$(command -v kitty)" ]]; then
+    brew install kitty
+  else
+    printParagraph "\`kitty\` appears to be already installed, at $(which kitty)"
+  fi
 
   printSubheader "zsh"
   if [[ ! "$(command -v zsh)" ]]; then
