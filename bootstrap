@@ -295,7 +295,12 @@ function bootstrap {
   printParagraph "$POST_SHELL_SETUP_MESSAGE"
   unset RUNZSH
 
-  printSubheader "Fonts for custom characters"
+  printSubheader "Fonts"
+  if [[ ! "$(brew ls font-jetbrains-mono)" ]]; then
+    brew install font-jetbrains-mono
+  else
+    printParagraph "\`font-jetbrains-mono\` appears to be already installed"
+  fi
   if [[ ! "$(brew ls font-hack-nerd-font)" ]]; then
     brew install font-hack-nerd-font
   else

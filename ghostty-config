@@ -4,7 +4,8 @@
 # Additionally, each config option is also explained in detail
 # on Ghostty's website, at https://ghostty.org/docs/config.
 
-font-family = Menlo
+font-family = Jetbrains Mono
+font-feature = -calt, -liga, -dlig
 font-size = 16
 window-padding-x = 10
 window-padding-y = 10
