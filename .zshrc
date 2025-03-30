@@ -176,6 +176,19 @@ function check_port_used() {
   lsof -nP -iTCP -sTCP:LISTEN | grep "${port}"
 }
 
+function inspect_commit() {
+  sha="$1"
+
+  if [[ -z "${sha}" ]]; then
+    echo "Usage: inspect_commit <commit-sha>"
+    return 1
+  fi
+
+  git log -n 1 "${sha}"
+  file=$(git show --name-only --pretty=format: "${sha}" | fzf --tmux=right --preview="git show --pretty=format: $sha -- {}" --preview-window=top)
+  git show --pretty=format: "${sha}" -- "${file}"
+}
+
 # initialize zoxide
 eval "$(zoxide init zsh)"
 
