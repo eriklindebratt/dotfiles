@@ -24,3 +24,6 @@ vim.g.deprecation_warnings = true
 
 -- Disable all animations
 vim.g.snacks_animate = false
+
+-- Require a Prettier config file for the Prettier formatter to be used
+vim.g.lazyvim_prettier_needs_config = false
