@@ -74,7 +74,6 @@ source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 eval "$(starship init zsh)"
 
 # User configuration
-[ -e ~/.zsh_profile ] && source ~/.zsh_profile
 
 # Ensure not just accidentally exiting a shell using e.g. `C-d`
 # This is mainly to ensure tmux doesn't end the session when the shell in the last window exits
