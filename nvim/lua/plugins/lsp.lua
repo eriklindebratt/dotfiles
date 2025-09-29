@@ -49,7 +49,8 @@ return {
                 vim.lsp.config(server, {
                   root_dir = function(bufnr, on_dir)
                     local is_deno = vim.fs.root(bufnr, { "deno.json", "deno.jsonc" }) ~= nil
-                    if is_deno == (server == "denols") and is_deno_enabled_file(vim.api.nvim_buf_get_name(bufnr)) then
+                      and is_deno_enabled_file(vim.api.nvim_buf_get_name(bufnr))
+                    if is_deno == (server == "denols") then
                       if root_dir then
                         return root_dir(bufnr, on_dir)
                       elseif type(markers) == "table" then
