@@ -212,8 +212,7 @@ async function poll() {
           : n.subject.type.toLowerCase();
 
         // Convert API URL to web URL
-        let htmlUrl: string | undefined = n.subject.latest_comment_url ??
-          n.subject.url;
+        let htmlUrl: string | undefined = n.subject.url;
         if (htmlUrl?.startsWith("https://api.github.com/repos/")) {
           htmlUrl = htmlUrl
             .replace("https://api.github.com/repos/", "https://github.com/")
