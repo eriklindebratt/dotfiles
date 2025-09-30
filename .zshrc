@@ -73,8 +73,6 @@ source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 eval "$(starship init zsh)"
 
-# User configuration
-
 # Ensure not just accidentally exiting a shell using e.g. `C-d`
 # This is mainly to ensure tmux doesn't end the session when the shell in the last window exits
 set -o ignoreeof # zsh
@@ -186,6 +184,32 @@ function inspect_commit() {
   git log -n 1 "${sha}"
   file=$(git show --name-only --pretty=format: "${sha}" | fzf --tmux=right --preview="git show --pretty=format: $sha -- {}" --preview-window=top)
   git show --pretty=format: "${sha}" -- "${file}"
+}
+
+function kill_process_on_port() {
+  port="$1"
+  if [[ -z "${port}" ]]; then
+    echo "Usage: kill_process_on_port <port>"
+    return 1
+  fi
+
+  result=$(lsof -nP -iTCP -sTCP:LISTEN | grep "${port}")
+  if [[ -z "$result" ]]; then
+    echo "\e[2mNo processes listening on port $port found.\e[0m"
+    return 1
+  fi
+  echo "\e[2m$result\e[0m"
+
+  pid=$(echo $result | awk '{print $2}' | head -1)
+  if [[ -z "$pid" ]]; then
+    echo "Failed to get pid from output."
+    return 1
+  fi
+
+  printf "\nAbout to kill pid \e[1m$pid\e[0m with SIGKILL\nPress Return to continue"
+  read response
+
+  kill -9 $pid
 }
 
 # initialize zoxide
