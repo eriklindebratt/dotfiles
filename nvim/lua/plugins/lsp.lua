@@ -37,21 +37,32 @@ return {
     "neovim/nvim-lspconfig",
     opts = function(_, opts)
       return vim.tbl_deep_extend("force", opts, {
-        inlay_hints = {
-          enabled = false,
-        },
+        -- inlay_hints = {
+        --   enabled = false,
+        -- },
         setup = {
           vtsls = function(_, opts)
-            opts.single_file_support = false -- See comment below
-            opts.root_dir = function(filename)
-              if is_deno_enabled_file(filename) then
-                -- Setting `root_dir` to `nil `will prevent the LSP client from attaching to a buffer - but only if `single_file_support = false`
-                return nil
+            if vim.lsp.config.denols and vim.lsp.config.vtsls then
+              ---@param server string
+              local resolve = function(server)
+                local markers, root_dir = vim.lsp.config[server].root_markers, vim.lsp.config[server].root_dir
+                vim.lsp.config(server, {
+                  root_dir = function(bufnr, on_dir)
+                    local is_deno = vim.fs.root(bufnr, { "deno.json", "deno.jsonc" }) ~= nil
+                      and is_deno_enabled_file(vim.api.nvim_buf_get_name(bufnr))
+                    if is_deno == (server == "denols") then
+                      if root_dir then
+                        return root_dir(bufnr, on_dir)
+                      elseif type(markers) == "table" then
+                        local root = vim.fs.root(bufnr, markers)
+                        return root and on_dir(root)
+                      end
+                    end
+                  end,
+                })
               end
-
-              local root_pattern = require("lspconfig.util").root_pattern
-              local get_root = root_pattern("pnpm-lock.yaml", "package-lock.json", "package.json")
-              return get_root(filename)
+              resolve("denols")
+              resolve("vtsls")
             end
           end,
         },
@@ -61,8 +72,7 @@ return {
 
   {
     {
-      "williamboman/mason.nvim",
-
+      "mason-org/mason.nvim",
       opts = function(_, opts)
         local ensure_installed = {
           -- NOTE: Remember to add languages in `treesitter.lua` as necesssary
