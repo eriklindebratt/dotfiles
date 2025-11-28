@@ -78,6 +78,7 @@ return {
           -- NOTE: Remember to add languages in `treesitter.lua` as necesssary
           "bash-language-server",
           "black",
+          "copilot-language-server",
           "css-lsp",
           "css-variables-language-server",
           "deno",
