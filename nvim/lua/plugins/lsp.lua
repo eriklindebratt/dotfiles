@@ -35,6 +35,7 @@ end
 return {
   {
     "neovim/nvim-lspconfig",
+    commit = "8055131", -- https://github.com/neovim/nvim-lspconfig/issues/4216
     opts = function(_, opts)
       return vim.tbl_deep_extend("force", opts, {
         inlay_hints = {
@@ -48,15 +49,26 @@ return {
                 local markers, root_dir = vim.lsp.config[server].root_markers, vim.lsp.config[server].root_dir
                 vim.lsp.config(server, {
                   root_dir = function(bufnr, on_dir)
-                    local is_deno = vim.fs.root(bufnr, { "deno.json", "deno.jsonc", ".git" }) ~= nil
-                      and is_deno_enabled_file(vim.api.nvim_buf_get_name(bufnr))
-                    if is_deno == (server == "denols") then
+                    local is_deno = is_deno_enabled_file(vim.api.nvim_buf_get_name(bufnr))
+
+                    if server == "denols" then
+                      if not is_deno then
+                        return nil
+                      end
                       if root_dir then
                         return root_dir(bufnr, on_dir)
                       elseif type(markers) == "table" then
                         local root = vim.fs.root(bufnr, markers)
                         return root and on_dir(root)
                       end
+                    end
+
+                    if server == "vtsls" then
+                      if is_deno then
+                        return nil
+                      end
+                      local root = vim.fs.root(bufnr, { "package.json", "tsconfig.json", ".git" })
+                      return root and on_dir(root)
                     end
                   end,
                 })
