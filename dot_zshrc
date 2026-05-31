@@ -7,8 +7,14 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 # brew shellenv does not add this, so keep it explicit.
 export PATH="$HOME/bin:$PATH"
 
-# Initialize zsh's native completion system (replaces Oh My Zsh).
-autoload -Uz compinit && compinit
+# Initialize zsh's native completion system (replaces Oh My Zsh). First secure any
+# group/other-writable completion dirs (common with Homebrew's site-functions) so
+# compinit's security check passes without a blocking y/n prompt, and so other
+# accounts on this machine can't inject completion code. compaudit discovers the
+# dirs, so this stays correct regardless of where zsh or completions are installed.
+autoload -Uz compinit compaudit
+compaudit 2>/dev/null | while IFS= read -r d; do chmod go-w -- "$d" 2>/dev/null; done
+compinit
 # Treat - and _ as interchangeable when completing.
 setopt HYPHEN_INSENSITIVE
 # Allow comments (with #) when typing interactively.
