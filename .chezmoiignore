@@ -1,0 +1,5 @@
+# Files that live in the source repo but must NOT be deployed to the home dir.
+# (chezmoi auto-ignores dotfile-prefixed entries like .macos / .github, so only
+# these plain-named files need listing.)
+Brewfile
+README.md
