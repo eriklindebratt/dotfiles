@@ -15,8 +15,18 @@ export PATH="$HOME/bin:$PATH"
 autoload -Uz compinit compaudit
 compaudit 2>/dev/null | while IFS= read -r d; do chmod go-w -- "$d" 2>/dev/null; done
 compinit
-# Treat - and _ as interchangeable when completing.
-setopt HYPHEN_INSENSITIVE
+# Tab-completion menu: highlight the current match and cycle through matches with
+# Tab/arrows (Oh My Zsh enabled this via menu selection).
+zstyle ':completion:*' menu select
+# Case- and hyphen/underscore-insensitive matching (+ substring), exactly as Oh My Zsh
+# built it from CASE_SENSITIVE=false + HYPHEN_INSENSITIVE=true. (The previous
+# `setopt HYPHEN_INSENSITIVE` was a bug — that's an OMZ variable, not a zsh option, so
+# it errored on every startup.)
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z-_}={A-Za-z_-}' 'r:|=*' 'l:|=* r:|=*'
+# Color completion entries like ls. macOS ls uses LSCOLORS, but zsh completion reads
+# LS_COLORS (GNU format), so set a sensible default and feed it in.
+export LS_COLORS='di=1;34:ln=1;36:ex=1;32:pi=33:so=35:bd=34;46:cd=34;43:su=37;41:sg=30;43:tw=30;42:ow=34;42'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 # Allow comments (with #) when typing interactively.
 setopt interactivecomments
 # Type a bare directory path to cd into it (Oh My Zsh enabled this).
