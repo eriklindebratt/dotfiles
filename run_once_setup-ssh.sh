@@ -6,20 +6,21 @@
 # Because this is run_once, declining now means it won't re-run automatically. To
 # set it up later, run this script manually or clear its chezmoi script state.
 
-# Non-interactive apply (CI/piped): skip rather than hang on a prompt.
-if [ ! -t 0 ]; then
-  echo "No TTY; skipping personal SSH setup. Re-run this script manually to set it up."
+# chezmoi does not attach the terminal to a script's stdin, so prompt via the
+# controlling terminal (/dev/tty). If there is none (CI, piped), skip.
+if ! { : </dev/tty; } 2>/dev/null; then
+  echo "No terminal; skipping personal SSH setup. Re-run this script manually to set it up."
   exit 0
 fi
 
-read -r -p "Set up personal SSH key/identity for this machine? (y/N) " response
+read -r -p "Set up personal SSH key/identity for this machine? (y/N) " response </dev/tty
 case "$response" in
   [yY][eE][sS]|[yY]) ;;
   *) echo "Skipping personal SSH setup."; exit 0 ;;
 esac
 
-read -r -p "Personal Git name: " personal_git_name
-read -r -p "Personal Git email: " personal_git_email
+read -r -p "Personal Git name: " personal_git_name </dev/tty
+read -r -p "Personal Git email: " personal_git_email </dev/tty
 
 ssh_dir="$HOME/.ssh"
 mkdir -p "$ssh_dir"
@@ -48,7 +49,7 @@ if [ ${#keys[@]} -gt 0 ]; then
   echo "  $i) Generate a new ed25519 key at $new_key"
   # $i is the "generate new" option; valid choices are 1..$i. Re-prompt on bad input.
   while true; do
-    if ! read -r -p "Choose [1-$i]: " choice; then
+    if ! read -r -p "Choose [1-$i]: " choice </dev/tty; then
       echo "No input; aborting personal SSH setup." >&2
       exit 1
     fi
@@ -74,7 +75,7 @@ echo "Add this public key to GitHub (Settings -> SSH and GPG keys -> New SSH key
 echo
 cat "${selected_key}.pub"
 echo
-read -r -p "Press Enter once the key is added to GitHub... " _
+read -r -p "Press Enter once the key is added to GitHub... " _ </dev/tty
 
 repo="$(chezmoi source-path)"
 if [ -z "$repo" ] || [ ! -d "$repo/.git" ]; then

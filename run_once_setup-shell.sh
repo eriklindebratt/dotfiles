@@ -6,12 +6,13 @@ case "$SHELL" in
   */zsh) exit 0 ;;
 esac
 
-if [ ! -t 0 ]; then
-  echo "No TTY; login shell is $SHELL (not zsh). Run 'chsh -s /bin/zsh' later to switch."
+# chezmoi does not attach the terminal to a script's stdin; prompt via /dev/tty.
+if ! { : </dev/tty; } 2>/dev/null; then
+  echo "No terminal; login shell is $SHELL. Run 'chsh -s /bin/zsh' later to switch."
   exit 0
 fi
 
-read -r -p "Login shell is $SHELL, not zsh. Switch to /bin/zsh? (y/N) " response
+read -r -p "Login shell is $SHELL, not zsh. Switch to /bin/zsh? (y/N) " response </dev/tty
 case "$response" in
   [yY][eE][sS]|[yY])
     chsh -s /bin/zsh && echo "Login shell set to /bin/zsh — restart your session for it to take effect."
