@@ -16,8 +16,8 @@ if [[ -z ${selected} ]]; then
   exit 0
 fi
 
-selected_abs_path=$(echo "$selected" | sed "s|~|$HOME|")
-selected_parent_name="$(basename $(dirname $selected) | tr . _ | sed 's/_//')"
+selected_abs_path="${selected/#\~/$HOME}"
+selected_parent_name="$(basename "$(dirname "$selected")" | tr . _ | sed 's/_//')"
 selected_name=$(basename "${selected_abs_path}" | tr . _)
 if [[ -n ${selected_parent_name} ]]; then
   selected_name="${selected_parent_name}/${selected_name}"
