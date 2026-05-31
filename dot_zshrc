@@ -19,6 +19,11 @@ compinit
 setopt HYPHEN_INSENSITIVE
 # Allow comments (with #) when typing interactively.
 setopt interactivecomments
+# Type a bare directory path to cd into it (Oh My Zsh enabled this).
+setopt AUTO_CD
+# Emacs-style line editing (Ctrl-A/Ctrl-E/Ctrl-K/Ctrl-W/...). Without this zsh selects
+# vi mode because $EDITOR/$VISUAL contain "vi" (nvim); OMZ used to force emacs.
+bindkey -e
 
 # Starship prompt.
 eval "$(starship init zsh)"
@@ -35,11 +40,22 @@ export IGNOREEOF=10 # bash
 export LANG=en_US.UTF-8
 export LC_ALL=$LANG
 
+# History: large, de-duplicated, shared across sessions (Oh My Zsh set this up before).
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=10000
+setopt EXTENDED_HISTORY HIST_EXPIRE_DUPS_FIRST HIST_IGNORE_DUPS HIST_IGNORE_SPACE HIST_VERIFY SHARE_HISTORY
+
 # Preferred editor for local and remote sessions.
 export VISUAL="nvim"
 export EDITOR="nvim"
 
 # --- aliases ---
+# Colored, detailed ls shortcuts (Oh My Zsh provided these).
+export CLICOLOR=1
+alias l="ls -lah"
+alias ll="ls -lh"
+alias la="ls -lAh"
 alias n="nvim"
 alias "n."="nvim ."
 alias "nvim."="nvim ."
