@@ -6,7 +6,9 @@
 # - highly inspired by https://github.com/mathiasbynens/dotfiles/blob/master/.macos
 ##
 
-set -e
+# Best-effort: do NOT abort on a single failed write. Some defaults (notably Safari
+# and other sandboxed app containers) require the terminal to have Full Disk Access
+# and fail harmlessly without it — one such failure shouldn't stop the rest.
 
 # Close any open System Preferences panes, to prevent them from overriding
 # settings we’re about to change
