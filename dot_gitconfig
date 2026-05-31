@@ -26,9 +26,6 @@
   default = current
 [pull]
   default = current
-[filter "media"]
-  clean = git-media-clean %f
-  smudge = git-media-smudge %f
 [merge]
   tool = opendiff
   conflictstyle = diff3
@@ -36,10 +33,11 @@
   colorMoved = default
 [diff "image"]
   command = ~/bin/git_img_diff
-  textconv = kitty icat
+  textconv = timg -pk
 [interactive]
   diffFilter = delta --color-only
 [delta]
   navigate = true
   light = false
-[user]
+[include]
+  path = .gitconfig.local
