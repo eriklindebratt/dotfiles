@@ -55,8 +55,10 @@ re-prompted if that file goes missing); `~/.gitconfig` includes it. Because `~/.
 is not managed by chezmoi, later edits stick and aren't reverted by `chezmoi apply`.
 
 `run_once_setup-ssh.sh` optionally configures a **personal** SSH key + identity for *this dotfiles
-repo only* (written to the repo's `.git/config`), switches the remote to SSH, and installs
-`pre-commit` / `pre-push` hooks that block commits/pushes made under the wrong identity.
+repo only* (written to the repo's `.git/config`) and installs `pre-commit` / `pre-push` hooks that
+block commits/pushes made under the wrong identity. It does **not** rewrite the remote: if origin
+isn't already an SSH URL it prints the `git remote set-url` command to switch it, and the
+`pre-push` hook blocks pushes until you do.
 
 > **Manual-clone caveat:** git never runs hooks from a freshly cloned repo, and `.git/hooks` is
 > not part of a clone — so the identity-guard hooks exist only after `setup-ssh` runs during an
