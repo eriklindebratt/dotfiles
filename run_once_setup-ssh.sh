@@ -77,7 +77,9 @@ cat "${selected_key}.pub"
 echo
 read -r -p "Press Enter once the key is added to GitHub... " _ </dev/tty
 
-repo="$(chezmoi source-path)"
+# Use chezmoi's injected env var — calling `chezmoi` directly here deadlocks
+# because chezmoi is already the process running this script.
+repo="${CHEZMOI_SOURCE_DIR:-$(chezmoi source-path 2>/dev/null)}"
 if [ -z "$repo" ] || [ ! -d "$repo/.git" ]; then
   echo "Could not resolve the chezmoi source repo (.git not found at '$repo'); aborting." >&2
   exit 1
