@@ -198,11 +198,12 @@ _gcloud_inc="$(brew --prefix)/share/google-cloud-sdk"
 [[ -f "$_gcloud_inc/completion.zsh.inc" ]] && source "$_gcloud_inc/completion.zsh.inc"
 unset _gcloud_inc
 
-# fzf key bindings (^R history, ^T files) and fuzzy completion.
-source <(fzf --zsh)
+# No fzf keybindings: Ctrl-R stays zsh's native inline reverse-i-search (via
+# `bindkey -e` above), matching the pre-chezmoi setup. fzf is still used explicitly
+# in the git aliases/functions — just not bound to ^R / ^T / Alt-C.
 
 # Fish-like inline suggestions from history.
 source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 # Command syntax highlighting. Must be sourced LAST — after autosuggestions and
-# anything else (e.g. fzf) that defines ZLE widgets.
+# anything else that defines ZLE widgets.
 source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
