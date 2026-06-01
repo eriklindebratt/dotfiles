@@ -193,7 +193,7 @@ function kill_process_on_port() {
 bindkey -s ^f "tmux-pick-session\n"
 
 # Google Cloud SDK: load PATH and completion from the Homebrew install, if present.
-_gcloud_inc="$(brew --prefix)/share/google-cloud-sdk"
+_gcloud_inc="$HOMEBREW_PREFIX/share/google-cloud-sdk"
 [[ -f "$_gcloud_inc/path.zsh.inc" ]] && source "$_gcloud_inc/path.zsh.inc"
 [[ -f "$_gcloud_inc/completion.zsh.inc" ]] && source "$_gcloud_inc/completion.zsh.inc"
 unset _gcloud_inc
@@ -203,7 +203,9 @@ unset _gcloud_inc
 # in the git aliases/functions — just not bound to ^R / ^T / Alt-C.
 
 # Fish-like inline suggestions from history.
-source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+[[ -f "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] &&
+  source "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 # Command syntax highlighting. Must be sourced LAST — after autosuggestions and
 # anything else that defines ZLE widgets.
-source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+[[ -f "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] &&
+  source "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
