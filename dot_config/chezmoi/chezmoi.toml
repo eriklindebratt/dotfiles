@@ -1,0 +1,5 @@
+# chezmoi's own config. Its default pager is "less", which seizes the terminal's
+# stdin during `apply`/`diff` and breaks the interactive prompts in run scripts.
+# Disabling it means we never have to pass --no-pager. chezmoi reads this from
+# ~/.config/chezmoi/chezmoi.toml (it is managed by chezmoi itself).
+pager = ""
