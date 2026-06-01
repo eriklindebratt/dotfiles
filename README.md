@@ -63,8 +63,3 @@ repo only* (written to the repo's `.git/config`), switches the remote to SSH, an
 > apply. If you manually clone and commit *before* running it, no personal identity is configured
 > and the hooks aren't installed (worst case: you commit under your global identity). Re-running
 > `setup-ssh` (or `chezmoi apply`) installs them.
-
-## CI
-
-`.github/workflows/ci.yml` runs shellcheck on the non-template scripts (ubuntu) and a chezmoi
-dry-run + Brewfile validation + `zsh -n` (macOS).

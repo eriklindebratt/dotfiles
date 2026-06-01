@@ -23,6 +23,7 @@ jobs:
           shellcheck \
             bin/executable_git_img_diff \
             bin/executable_tmux-pick-session \
+            dot_claude/executable_statusline.sh \
             .macos \
             run_setup-gitconfig.sh \
             run_once_setup-shell.sh \
