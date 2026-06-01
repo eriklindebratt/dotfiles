@@ -8,12 +8,16 @@ on:
 jobs:
   shellcheck:
     name: shellcheck
-    runs-on: ubuntu-latest
+    runs-on: macos-latest # for Homebrew, so we lint with the Brewfile's shellcheck
     steps:
       - uses: actions/checkout@v4
-      # shellcheck is preinstalled on GitHub's ubuntu runners. Template (.tmpl)
-      # scripts are excluded — their {{ }} syntax isn't valid shell; the chezmoi
-      # dry-run job renders and exercises those instead.
+      # Install the same shellcheck the Brewfile (and your machines) use — brew's
+      # current version — so CI matches local exactly, with no version pin or skew.
+      # Just this one formula; a full `brew bundle` would also pull in every cask.
+      - name: Install shellcheck (matches the Brewfile)
+        run: brew install shellcheck
+      # Template (.tmpl) scripts are excluded — their {{ }} syntax isn't valid shell;
+      # the chezmoi dry-run job renders and exercises those instead.
       - name: shellcheck non-template scripts
         run: |
           shellcheck \
