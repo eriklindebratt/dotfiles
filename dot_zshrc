@@ -1,0 +1,211 @@
+# ~/.zshrc — interactive zsh configuration (managed by chezmoi)
+
+# Put Homebrew on PATH (Apple Silicon). Must run before any `brew` use below.
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# Personal scripts live in ~/bin (e.g. git_img_diff, tmux-pick-session).
+# brew shellenv does not add this, so keep it explicit.
+export PATH="$HOME/bin:$PATH"
+
+# Initialize zsh's native completion system (replaces Oh My Zsh). First secure any
+# group/other-writable completion dirs (common with Homebrew's site-functions) so
+# compinit's security check passes without a blocking y/n prompt, and so other
+# accounts on this machine can't inject completion code. compaudit discovers the
+# dirs, so this stays correct regardless of where zsh or completions are installed.
+autoload -Uz compinit compaudit
+compaudit 2>/dev/null | while IFS= read -r d; do chmod go-w -- "$d" 2>/dev/null; done
+compinit
+# Tab-completion menu: highlight the current match and cycle through matches with
+# Tab/arrows (Oh My Zsh enabled this via menu selection).
+zstyle ':completion:*' menu select
+# Case- and hyphen/underscore-insensitive matching (+ substring), exactly as Oh My Zsh
+# built it from CASE_SENSITIVE=false + HYPHEN_INSENSITIVE=true. (The previous
+# `setopt HYPHEN_INSENSITIVE` was a bug — that's an OMZ variable, not a zsh option, so
+# it errored on every startup.)
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z-_}={A-Za-z_-}' 'r:|=*' 'l:|=* r:|=*'
+# Color completion entries like ls. macOS ls uses LSCOLORS, but zsh completion reads
+# LS_COLORS (GNU format), so set a sensible default and feed it in.
+export LS_COLORS='di=1;34:ln=1;36:ex=1;32:pi=33:so=35:bd=34;46:cd=34;43:su=37;41:sg=30;43:tw=30;42:ow=34;42'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+# Allow comments (with #) when typing interactively.
+setopt interactivecomments
+# Type a bare directory path to cd into it (Oh My Zsh enabled this).
+setopt AUTO_CD
+# Emacs-style line editing (Ctrl-A/Ctrl-E/Ctrl-K/Ctrl-W/...). Without this zsh selects
+# vi mode because $EDITOR/$VISUAL contain "vi" (nvim); OMZ used to force emacs.
+bindkey -e
+
+# Starship prompt.
+eval "$(starship init zsh)"
+
+# Activate mise: manage runtime versions (node, pnpm, deno) and shims.
+eval "$(mise activate zsh)"
+
+# Don't exit the shell on a stray C-d. Mainly so tmux doesn't end the session
+# when the shell in the last window would otherwise exit.
+set -o ignoreeof    # zsh
+export IGNOREEOF=10 # bash
+
+# Language environment.
+export LANG=en_US.UTF-8
+export LC_ALL=$LANG
+
+# History: large, de-duplicated, shared across sessions (Oh My Zsh set this up before).
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=10000
+setopt EXTENDED_HISTORY HIST_EXPIRE_DUPS_FIRST HIST_IGNORE_DUPS HIST_IGNORE_SPACE HIST_VERIFY SHARE_HISTORY
+
+# Preferred editor for local and remote sessions.
+export VISUAL="nvim"
+export EDITOR="nvim"
+
+# --- aliases ---
+# Colored, detailed ls shortcuts (Oh My Zsh provided these).
+export CLICOLOR=1
+alias l="ls -lah"
+alias ll="ls -lh"
+alias la="ls -lAh"
+alias n="nvim"
+alias "n."="nvim ."
+alias "nvim."="nvim ."
+alias g="git"
+alias gb="git branch"
+alias gd="git diff"
+alias gs="git s"
+alias gds="gd --staged"
+# Fuzzy-pick any (incl. remote) branch and check it out.
+alias gba="git branch -a | fzf --ansi | cut -d ':' -f 2 | xargs echo | sed -E 's/^(remotes\/[^\/]+\/)//' | xargs git checkout"
+alias toggle_macos_dark_mode="osascript -e 'tell app \"System Events\" to tell appearance preferences to set dark mode to not dark mode'"
+alias edit_day_note="view_day_note"
+
+# pnpm
+export PNPM_HOME="$HOME/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
+
+# Default grep options: case-insensitive, color, skip .git.
+export GREP_OPTIONS='-iI --color --exclude-dir=.git'
+
+# fuzzy finder options
+# - use ripgrep for file search (using its `--files` flag), tell it to:
+#   - `--follow`: follow symbolic links
+#   - `--hidden`: include "hidden" files
+#   - `--no-ignore-vcs`: ignore VCS ignore files
+export FZF_DEFAULT_COMMAND='rg --files --follow --hidden --no-ignore-vcs'
+# - `--color=bw`: don't use colors since they don't respect the terminal's colorscheme
+export FZF_DEFAULT_OPTS='--color=bw'
+
+# Point ripgrep at its config file.
+export RIPGREP_CONFIG_PATH="${HOME}/.ripgreprc"
+
+# Path to the NeoVim log file.
+export NVIM_LOG_FILE=~/.cache/nvim/log
+
+# --- functions ---
+
+# mcd: make a directory (if missing) and cd into it.
+function mcd() {
+  if [ -z "$1" ]; then
+    echo "Usage: mcd <directory>" && return 1
+  fi
+
+  if [ ! -d $1 ]; then
+    mkdir -p $1
+  fi
+
+  cd $1
+}
+
+# make_day_note: open today's YYYY-MM-DD.md note in nvim.
+function make_day_note() {
+  formatted_date=$(date +"%Y-%m-%d")
+  filename="${formatted_date}.md"
+  nvim "${filename}"
+}
+
+# view_day_note: open today's note if it exists, else report none.
+function view_day_note() {
+  formatted_date=$(date +"%Y-%m-%d")
+  filename="${formatted_date}.md"
+  if [[ ! -f ${filename} ]]; then
+    echo "Couldn't find a day note for the current date (${formatted_date})"
+    return 1
+  fi
+  nvim "${filename}"
+}
+
+# check_port_used: list processes listening on a given port.
+function check_port_used() {
+  port="$1"
+  if [[ -z "${port}" ]]; then
+    echo "Usage: check_port_used <port>" && return 1
+  fi
+  lsof -nP -iTCP -sTCP:LISTEN | grep "${port}"
+}
+
+# inspect_commit: browse files changed in a commit, with an fzf preview.
+function inspect_commit() {
+  sha="$1"
+
+  if [[ -z "${sha}" ]]; then
+    echo "Usage: inspect_commit <commit-sha>"
+    return 1
+  fi
+
+  git log -n 1 "${sha}"
+  file=$(git show --name-only --pretty=format: "${sha}" | fzf --tmux=right --preview="git show --pretty=format: $sha -- {}" --preview-window=top)
+  git show --pretty=format: "${sha}" -- "${file}"
+}
+
+# kill_process_on_port: SIGKILL the process listening on a port (after confirm).
+function kill_process_on_port() {
+  port="$1"
+  if [[ -z "${port}" ]]; then
+    echo "Usage: kill_process_on_port <port>"
+    return 1
+  fi
+
+  result=$(lsof -nP -iTCP -sTCP:LISTEN | grep "${port}")
+  if [[ -z "$result" ]]; then
+    echo "\e[2mNo processes listening on port $port found.\e[0m"
+    return 1
+  fi
+  echo "\e[2m$result\e[0m"
+
+  pid=$(echo $result | awk '{print $2}' | head -1)
+  if [[ -z "$pid" ]]; then
+    echo "Failed to get pid from output."
+    return 1
+  fi
+
+  printf "\nAbout to kill pid \e[1m$pid\e[0m with SIGKILL\nPress Return to continue"
+  read response
+
+  kill -9 $pid
+}
+
+# --- keybindings ---
+# ^F: launch the tmux session picker (resolved via PATH, no hardcoded path).
+bindkey -s ^f "tmux-pick-session\n"
+
+# Google Cloud SDK: load PATH and completion from the Homebrew install, if present.
+_gcloud_inc="$HOMEBREW_PREFIX/share/google-cloud-sdk"
+[[ -f "$_gcloud_inc/path.zsh.inc" ]] && source "$_gcloud_inc/path.zsh.inc"
+[[ -f "$_gcloud_inc/completion.zsh.inc" ]] && source "$_gcloud_inc/completion.zsh.inc"
+unset _gcloud_inc
+
+# No fzf keybindings: Ctrl-R stays zsh's native inline reverse-i-search (via
+# `bindkey -e` above), matching the pre-chezmoi setup. fzf is still used explicitly
+# in the git aliases/functions — just not bound to ^R / ^T / Alt-C.
+
+# Fish-like inline suggestions from history.
+[[ -f "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] &&
+  source "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+# Command syntax highlighting. Must be sourced LAST — after autosuggestions and
+# anything else that defines ZLE widgets.
+[[ -f "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] &&
+  source "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"

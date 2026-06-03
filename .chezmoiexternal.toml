@@ -1,0 +1,6 @@
+# tmux plugin manager (tpm), managed as a chezmoi external: cloned on first
+# apply and refreshed on the interval below — replaces the old manual git clone.
+[".config/tmux/plugins/tpm"]
+  type = "git-repo"
+  url = "https://github.com/tmux-plugins/tpm"
+  refreshPeriod = "168h"

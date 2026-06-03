@@ -1,0 +1,18 @@
+#!/bin/bash
+# Install the mise-managed runtimes listed in ~/.tool-versions. Re-runs only when
+# dot_tool-versions changes (hash line below). Runs after install-packages
+# (alphabetical order), so the brew-installed mise already exists.
+eval "$(/opt/homebrew/bin/brew shellenv)"
+# hash: {{ include "dot_tool-versions" | sha256sum }}
+# chezmoi does not attach the terminal to a script's stdin; prompt via /dev/tty.
+if ! { : </dev/tty; } 2>/dev/null; then
+  echo "No terminal; skipping runtime install. Run 'mise install' later."
+  exit 0
+fi
+read -r -p "Install mise-managed runtimes from ~/.tool-versions now? (y/N) " response </dev/tty
+case "$response" in
+  # cd into $HOME so mise picks up ~/.tool-versions (resolved by directory walk),
+  # independent of the script's working directory.
+  [yY][eE][sS]|[yY]) cd "$HOME" && mise install ;;
+  *) echo "Skipping runtime install. Run 'mise install' later." ;;
+esac

@@ -1,0 +1,23 @@
+#!/bin/bash
+# Apply macOS defaults from .macos. Re-runs only when .macos changes (hash line below).
+# .macos issues sudo commands, so confirm + prime sudo up front. chezmoi does not attach
+# the terminal to a script's stdin, so prompt via /dev/tty; skip if there's no terminal.
+# hash: {{ include ".macos" | sha256sum }}
+
+if ! { : </dev/tty; } 2>/dev/null; then
+  echo "No terminal; skipping macOS defaults (.macos). Run it manually to apply."
+  exit 0
+fi
+
+read -r -p "Apply macOS defaults from .macos now? (y/N) " response </dev/tty
+case "$response" in
+  [yY][eE][sS]|[yY]) ;;
+  *) echo "Skipping macOS defaults."; exit 0 ;;
+esac
+
+# Prime sudo up front so .macos's sudo calls don't prompt partway through.
+sudo -v
+
+source "{{ .chezmoi.sourceDir }}/.macos"
+
+echo "Done. Some macOS changes may require a logout or restart to take effect."

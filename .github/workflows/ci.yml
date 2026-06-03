@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  shellcheck:
+    name: shellcheck
+    runs-on: macos-latest # for Homebrew, so we lint with the Brewfile's shellcheck
+    steps:
+      - uses: actions/checkout@v4
+      # Install the same shellcheck the Brewfile (and your machines) use — brew's
+      # current version — so CI matches local exactly, with no version pin or skew.
+      # Just this one formula; a full `brew bundle` would also pull in every cask.
+      - name: Install shellcheck (matches the Brewfile)
+        run: brew install shellcheck
+      # Template (.tmpl) scripts are excluded — their {{ }} syntax isn't valid shell;
+      # the chezmoi dry-run job renders and exercises those instead.
+      - name: shellcheck non-template scripts
+        run: |
+          shellcheck \
+            bin/executable_git_img_diff \
+            bin/executable_tmux-pick-session \
+            dot_claude/executable_statusline.sh \
+            .macos \
+            run_setup-gitconfig.sh \
+            run_once_setup-shell.sh \
+            run_once_setup-ssh.sh
+
+  chezmoi-dry-run:
+    name: chezmoi dry-run
+    runs-on: macos-latest # Homebrew is preinstalled on macOS runners
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install chezmoi
+        run: brew install chezmoi
+
+      # Renders every template (incl. the .tmpl scripts) and verifies the source
+      # state applies cleanly to a throwaway destination. --dry-run runs no scripts;
+      # --exclude=externals skips cloning tpm.
+      - name: chezmoi apply (dry-run)
+        run: |
+          mkdir -p /tmp/chezmoi-test
+          chezmoi apply --dry-run --exclude=externals \
+            --source="$PWD" --destination=/tmp/chezmoi-test --verbose
+
+      # Validate the Brewfile parses and every formula/cask name resolves, without
+      # installing. (`brew bundle check` only reports installed status, so it can't
+      # be used on a clean runner.) `brew info` exits non-zero on an unknown name.
+      - name: Validate Brewfile
+        run: |
+          names="$(brew bundle list --all --file=Brewfile)"
+          rc=0
+          while IFS= read -r name; do
+            [ -z "$name" ] && continue
+            if ! brew info "$name" >/dev/null 2>&1; then
+              echo "::error::Unknown Homebrew package in Brewfile: $name"
+              rc=1
+            fi
+          done <<< "$names"
+          exit $rc
+
+      - name: zsh syntax check
+        run: zsh -n dot_zshrc

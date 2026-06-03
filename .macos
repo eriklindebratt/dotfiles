@@ -6,7 +6,9 @@
 # - highly inspired by https://github.com/mathiasbynens/dotfiles/blob/master/.macos
 ##
 
-set -e
+# Best-effort: do NOT abort on a single failed write. Some defaults (notably Safari
+# and other sandboxed app containers) require the terminal to have Full Disk Access
+# and fail harmlessly without it — one such failure shouldn't stop the rest.
 
 # Close any open System Preferences panes, to prevent them from overriding
 # settings we’re about to change
@@ -193,7 +195,8 @@ defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
 defaults write com.apple.NetworkBrowser BrowseAllInterfaces -bool true
 
 # Show the ~/Library folder
-chflags nohidden ~/Library && xattr -d com.apple.FinderInfo ~/Library 2> /dev/null || true
+chflags nohidden ~/Library
+xattr -d com.apple.FinderInfo ~/Library 2> /dev/null || true
 
 # Show the /Volumes folder
 sudo chflags nohidden /Volumes
