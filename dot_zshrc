@@ -188,6 +188,107 @@ function kill_process_on_port() {
   kill -9 $pid
 }
 
+# Managing Git worktrees
+wt() {
+  # Validate arguments: "add" requires a branch name, "remove" does not
+  if [[ $# -lt 1 || $# -gt 2 || ( "$1" != "add" && "$1" != "remove" ) ]]; then
+    echo "Usage: wt <add|remove> [branch-name]" >&2
+    return 1
+  fi
+  if [[ "$1" == "add" && -z "${2:-}" ]]; then
+    echo "Usage: wt add <branch-name>" >&2
+    return 1
+  fi
+
+  local action="$1"
+  local branch="${2:-}"
+  local repo_root
+
+  # Get the relative path from the current directory back to the repo root.
+  # --show-cdup always includes a trailing slash when non-empty (e.g. "../../"),
+  # and returns an empty string when already at the root — both cases work
+  # correctly when concatenated with ".worktrees/...".
+  # stderr is not captured, so any git error prints directly to the terminal.
+  repo_root=$(git rev-parse --show-cdup) || return
+
+  local bold=$'\033[1m'
+  local cyan=$'\033[36m'
+  local reset=$'\033[0m'
+
+  # If no branch name was given, list all worktrees and their branches via fzf
+  if [[ -z "$branch" ]]; then
+    local selected
+    selected=$(git worktree list | fzf --prompt="Select worktree: ")
+    if [[ -z "$selected" ]]; then
+      printf "Aborted\n"
+      return 0
+    fi
+    # Extract branch name from the "[branch-name]" column
+    branch=$(echo "$selected" | awk '{print $3}' | tr -d '[]')
+  fi
+
+  # If branch looks like a PR number or GitHub PR URL, offer to resolve the actual branch name
+  if [[ "$branch" =~ ^[0-9]+$ ]] || [[ "$branch" == *github.com*pull* ]]; then
+    local is_url=false
+    [[ "$branch" == *github.com*pull* ]] && is_url=true
+    printf '%s' "${bold}That looks like a pull request. Resolve its branch? [Y/n] ${reset}"
+    read -r confirm
+    if [[ ! "$confirm" =~ ^([Yy][Ee][Ss]|[Yy])?$ ]]; then
+      if $is_url; then
+        printf "Aborted\n"; return 0
+      fi
+      # Not a URL — treat the number as a literal branch name
+    else
+      branch=$(gh pr view "$branch" --json headRefName --jq '.headRefName') || return
+      printf "${bold}Resolved branch:${reset} ${cyan}${branch}${reset}\n"
+      printf '%s' "${bold}Continue? [Y/n] ${reset}"
+      read -r confirm
+      [[ "$confirm" =~ ^([Yy][Ee][Ss]|[Yy])?$ ]] || { printf "Aborted\n"; return 0; }
+    fi
+  fi
+
+  # Normalize the branch name for use as a directory name by replacing
+  # forward slashes and backslashes with hyphens
+  local safe_branch
+  safe_branch=$(echo "$branch" | tr '/\\' '-')
+
+  local worktree_path="${repo_root}.worktrees/${safe_branch}"
+
+  # Resolve the worktree path to absolute for display purposes, using "." as
+  # fallback when repo_root is empty (i.e. already at the repo root).
+  # Replace the home directory prefix with "~" for brevity.
+  local display_path
+  display_path="$(cd "${repo_root:-.}" && pwd)/.worktrees/${safe_branch}"
+  display_path="${display_path/#$HOME/~}"
+
+  if [[ "$action" == "add" ]]; then
+    printf "${bold}Add worktree?${reset}\n"
+    printf "  ${bold}•${reset} ${bold}Path:${reset}   ${cyan}${display_path}${reset}\n"
+    printf "  ${bold}•${reset} ${bold}Branch:${reset} ${cyan}${branch}${reset}\n"
+    printf '%s' "${bold}[Y/n] ${reset}"
+    read -r confirm
+    [[ "$confirm" =~ ^([Yy][Ee][Ss]|[Yy])?$ ]] || { printf "Aborted\n"; return 0; }
+    # If the branch already exists, check it out into the worktree directly;
+    # otherwise create a new branch with -b
+    if git show-ref --verify --quiet "refs/heads/${branch}"; then
+      git worktree add "$worktree_path" "$branch" || return
+    else
+      git worktree add "$worktree_path" -b "$branch" || return
+    fi
+    printf '%s' "${bold}Change to new worktree directory? [Y/n] ${reset}"
+    read -r confirm
+    [[ "$confirm" =~ ^([Yy][Ee][Ss]|[Yy])?$ ]] && cd "$worktree_path"
+  else
+    printf '%s' "${bold}Remove worktree at ${cyan}${display_path}${reset}${bold}? [Y/n] ${reset}"
+    read -r confirm
+    [[ "$confirm" =~ ^([Yy][Ee][Ss]|[Yy])?$ ]] || { printf "Aborted\n"; return 0; }
+    git worktree remove "$worktree_path" || return
+    printf '%s' "${bold}Also delete branch ${cyan}${branch}${reset}${bold}? [Y/n] ${reset}"
+    read -r confirm
+    [[ "$confirm" =~ ^([Yy][Ee][Ss]|[Yy])?$ ]] && git branch -d "$branch"
+  fi
+}
+
 # --- keybindings ---
 # ^F: launch the tmux session picker (resolved via PATH, no hardcoded path).
 bindkey -s ^f "tmux-pick-session\n"
