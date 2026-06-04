@@ -289,6 +289,10 @@ wt() {
   fi
 }
 
+# Treat `/` as a word boundary so Ctrl-W deletes back to the nearest `/` (path
+# component), matching Oh My Zsh's default. Zsh's built-in default includes `/`.
+WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
+
 # --- keybindings ---
 # ^F: launch the tmux session picker (resolved via PATH, no hardcoded path).
 bindkey -s ^f "tmux-pick-session\n"
