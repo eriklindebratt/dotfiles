@@ -292,6 +292,9 @@ wt() {
 # --- keybindings ---
 # ^F: launch the tmux session picker (resolved via PATH, no hardcoded path).
 bindkey -s ^f "tmux-pick-session\n"
+# Forward-delete (fn+Delete / dedicated Delete key sends \e[3~). Without this,
+# the trailing ~ of the escape sequence prints as a literal character.
+bindkey "^[[3~" delete-char
 
 # Google Cloud SDK: load PATH and completion from the Homebrew install, if present.
 _gcloud_inc="$HOMEBREW_PREFIX/share/google-cloud-sdk"
