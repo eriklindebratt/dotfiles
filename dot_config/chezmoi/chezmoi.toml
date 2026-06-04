@@ -3,3 +3,12 @@
 # Disabling it means we never have to pass --no-pager. chezmoi reads this from
 # ~/.config/chezmoi/chezmoi.toml (it is managed by chezmoi itself).
 pager = ""
+
+[merge]
+  command = "nvim"
+  args = [
+    "-d",
+    "{{ .Destination }}",
+    "{{ .Source }}",
+    "{{ .Target }}"
+  ]
