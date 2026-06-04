@@ -315,5 +315,9 @@ unset _gcloud_inc
   source "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 # Command syntax highlighting. Must be sourced LAST — after autosuggestions and
 # anything else that defines ZLE widgets.
-[[ -f "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] &&
+if [[ -f "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
   source "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+  # Comments (#) default to fg=black,bold — invisible on dark terminals. Use a
+  # mid-gray that's readable on both dark and light backgrounds.
+  ZSH_HIGHLIGHT_STYLES[comment]='fg=245'
+fi
