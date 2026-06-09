@@ -5,7 +5,7 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Personal scripts live in ~/bin (e.g. git_img_diff, tmux-pick-session).
 # brew shellenv does not add this, so keep it explicit.
-export PATH="$HOME/bin:$PATH"
+export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
 
 # Initialize zsh's native completion system (replaces Oh My Zsh). First secure any
 # group/other-writable completion dirs (common with Homebrew's site-functions) so
