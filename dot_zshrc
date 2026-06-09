@@ -15,9 +15,17 @@ export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
 autoload -Uz compinit compaudit
 compaudit 2>/dev/null | while IFS= read -r d; do chmod go-w -- "$d" 2>/dev/null; done
 compinit
+# Load `complist` up front: it implements the interactive selection menu (enabled
+# just below) and defines the `menuselect` keymap. `menu select` would load it
+# lazily on the first completion, but the `bindkey` further down needs that keymap
+# to already exist at startup.
+zmodload zsh/complist
 # Tab-completion menu: highlight the current match and cycle through matches with
 # Tab/arrows (Oh My Zsh enabled this via menu selection).
 zstyle ':completion:*' menu select
+# In that menu Tab (`complete-word`) cycles forward but Shift-Tab is unbound; bind
+# Shift-Tab (`^[[Z`) to `reverse-menu-complete` so it cycles backward.
+bindkey -M menuselect '^[[Z' reverse-menu-complete
 # Case- and hyphen/underscore-insensitive matching (+ substring), exactly as Oh My Zsh
 # built it from CASE_SENSITIVE=false + HYPHEN_INSENSITIVE=true. (The previous
 # `setopt HYPHEN_INSENSITIVE` was a bug — that's an OMZ variable, not a zsh option, so
