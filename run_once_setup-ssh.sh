@@ -106,6 +106,8 @@ ensure_remote() {
       path="${origin_url#https://github.com/}"
       path="${path#git@github.com:}"
       path="${path#ssh://git@github.com/}"
+      # git accepts a trailing slash on clone; drop it so it can't end up in the alias URL.
+      path="${path%/}"
       new_url="git@$alias_host:${path%.git}.git"
       git -C "$repo" remote set-url origin "$new_url"
       echo "Rewrote origin: $origin_url -> $new_url"
