@@ -63,7 +63,8 @@ ensure_alias_block() {
     # (when no block matches, ssh -G echoes the literal alias back as the hostname).
     # Don't append a duplicate — warn and leave it for manual reconciliation.
     echo "WARNING: 'Host $alias_host' already exists but resolves to HostName '$resolved_hostname', not github.com." >&2
-    echo "  Left untouched to avoid a duplicate block; reconcile it manually." >&2
+    echo "  Left untouched to avoid a duplicate block; edit your ssh config so that" >&2
+    echo "  'Host $alias_host' has 'HostName github.com', or remove the block and re-run." >&2
     return 0
   fi
 
