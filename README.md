@@ -60,9 +60,10 @@ repo only*. It writes the identity and key choice to the repo's `.git/config`, e
 GitHub — even on machines whose `Host github.com` entry carries another identity), rewrites a
 github.com origin (HTTPS or SSH) to `git@github-personal:<owner>/<repo>.git`, and installs
 `pre-commit` / `pre-push` hooks that block commits/pushes made under the wrong identity, via a
-non-alias remote, or via an alias that no longer resolves to github.com with the recorded key. A pre-existing
-`Host github-personal` block pointing at a different key is never modified — the script warns and
-the `pre-push` hook blocks pushes until you point its `IdentityFile` at the selected key.
+non-alias remote, or via an alias that no longer resolves to github.com with the recorded key. A
+pre-existing `Host github-personal` block pointing at a different key is never modified — the
+script warns and the `pre-push` hook blocks pushes until you point its `IdentityFile` at the
+selected key.
 
 When the repo is already set up (`hooks.sshKey` set and the key exists), re-runs — after this
 script's contents change, or a manual invocation — offer to set it up again instead of running
