@@ -38,9 +38,11 @@ ssh_config="$ssh_dir/config"
 
 # Ensure ~/.ssh/config has a Host block for $alias_host pointing at the given key.
 # Existence is checked with `ssh -G` rather than grep so a block defined via an
-# Include also counts. If the alias exists but resolves to a different key, warn
-# and leave it alone — we never rewrite pre-existing ssh config; the pre-push
-# hook blocks pushes until it is reconciled.
+# Include also counts. If the alias exists but resolves to a different key or
+# hostname, warn and leave it alone — we never rewrite pre-existing ssh config.
+# Returns 0 when the alias resolves to github.com with the given key (or was just
+# added), 1 when an existing block was left in place that the pre-push hook will
+# block on until it is fixed by hand.
 ensure_alias_block() {
   local key="$1" resolved_hostname resolved_keys key_display
   resolved_hostname="$(ssh -G "$alias_host" 2>/dev/null | awk '/^hostname /{print $2}')"
@@ -56,6 +58,7 @@ ensure_alias_block() {
       echo "  (If a 'Host *' block in your ssh config also sets IdentityFile, that key shows" >&2
       echo "  up here too — remove it from 'Host *' so only this alias' key is offered.)" >&2
       echo "  Left untouched — align its IdentityFile manually; pushes are blocked until then." >&2
+      return 1
     fi
     return 0
   elif [ "$resolved_hostname" != "$alias_host" ]; then
@@ -65,7 +68,7 @@ ensure_alias_block() {
     echo "WARNING: 'Host $alias_host' already exists but resolves to HostName '$resolved_hostname', not github.com." >&2
     echo "  Left untouched to avoid a duplicate block; edit your ssh config so that" >&2
     echo "  'Host $alias_host' has 'HostName github.com', or remove the block and re-run." >&2
-    return 0
+    return 1
   fi
 
   mkdir -p "$ssh_dir"
@@ -238,12 +241,14 @@ if [ -n "$configured_key" ]; then
     git -C "$repo" config core.sshCommand "ssh -i \"$configured_key\" -o IdentitiesOnly=yes"
     git -C "$repo" config hooks.sshHostAlias "$alias_host"
     install_hooks
-    ensure_alias_block "$configured_key"
-    if ensure_remote; then
+    ok=true
+    ensure_alias_block "$configured_key" || ok=false
+    ensure_remote || ok=false
+    if $ok; then
       echo "Done — personal SSH set up for the dotfiles repo at $repo."
     else
-      echo "Personal SSH set up for the dotfiles repo at $repo — but origin still needs"
-      echo "to point at the '$alias_host' alias (see the note above) before you can push."
+      echo "Personal SSH set up for the dotfiles repo at $repo — but pushes stay blocked"
+      echo "until the warning(s) above are fixed."
     fi
     exit 0
   fi
@@ -337,11 +342,12 @@ git -C "$repo" config hooks.sshKey "$selected_key"
 git -C "$repo" config hooks.sshHostAlias "$alias_host"
 
 install_hooks
-ensure_alias_block "$selected_key"
-if ensure_remote; then
+ok=true
+ensure_alias_block "$selected_key" || ok=false
+ensure_remote || ok=false
+if $ok; then
   echo "Personal SSH identity configured for the dotfiles repo at $repo."
 else
-  echo "Personal SSH identity configured for the dotfiles repo at $repo — but origin"
-  echo "still needs to point at the '$alias_host' alias (see the note above) before you"
-  echo "can push."
+  echo "Personal SSH identity configured for the dotfiles repo at $repo — but pushes"
+  echo "stay blocked until the warning(s) above are fixed."
 fi
