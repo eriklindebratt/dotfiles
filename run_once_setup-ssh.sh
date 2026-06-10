@@ -53,6 +53,8 @@ ensure_alias_block() {
       echo "WARNING: 'Host $alias_host' already exists in your ssh config but resolves to:" >&2
       printf '%s\n' "$resolved_keys" | sed 's/^/    /' >&2
       echo "  instead of the selected key: $key" >&2
+      echo "  (If a 'Host *' block in your ssh config also sets IdentityFile, that key shows" >&2
+      echo "  up here too — remove it from 'Host *' so only this alias' key is offered.)" >&2
       echo "  Left untouched — align its IdentityFile manually; pushes are blocked until then." >&2
     fi
     return 0
@@ -88,13 +90,14 @@ ensure_alias_block() {
 # Rewrites github.com URLs only (HTTPS or SSH) — turning an arbitrary host's URL
 # into the matching SSH one is host-specific and easy to get wrong, so other
 # hosts just get a heads-up; the pre-push hook blocks pushes until origin uses
-# the alias, so this is a nudge, not a hard failure.
+# the alias, so this is a nudge, not a hard failure. Returns 0 when origin is on
+# the alias afterwards, 1 when the caller must still move it by hand.
 ensure_remote() {
   local origin_url path new_url
   origin_url="$(git -C "$repo" config remote.origin.url)"
   case "$origin_url" in
     git@"$alias_host":* | ssh://git@"$alias_host"/*)
-      ;; # already on the alias — nothing to do
+      return 0 ;; # already on the alias — nothing to do
     https://github.com/* | git@github.com:* | ssh://git@github.com/*)
       path="${origin_url#https://github.com/}"
       path="${path#git@github.com:}"
@@ -102,11 +105,13 @@ ensure_remote() {
       new_url="git@$alias_host:${path%.git}.git"
       git -C "$repo" remote set-url origin "$new_url"
       echo "Rewrote origin: $origin_url -> $new_url"
+      return 0
       ;;
     *)
       echo "NOTE: origin is '$origin_url' (not a github.com URL); pushes are blocked" >&2
       echo "until it uses the '$alias_host' alias, e.g.:" >&2
       echo "  git -C \"$repo\" remote set-url origin git@$alias_host:<owner>/<repo>.git" >&2
+      return 1
       ;;
   esac
 }
@@ -180,6 +185,8 @@ if [ -n "$alias_host" ]; then
   if [ "$resolved_keys" != "$key" ]; then
     echo "BLOCKED: 'Host $alias_host' resolves to different key(s) than the recorded $key:" >&2
     printf '%s\n' "$resolved_keys" | sed 's/^/    /' >&2
+    echo "(If a 'Host *' block in your ssh config also sets IdentityFile, that key shows" >&2
+    echo "up here too — remove it from 'Host *' so only this alias' key is offered.)" >&2
     echo "Align the IdentityFile in your ssh config with hooks.sshKey." >&2
     exit 1
   fi
@@ -231,8 +238,12 @@ if [ -n "$configured_key" ]; then
     git -C "$repo" config hooks.sshHostAlias "$alias_host"
     install_hooks
     ensure_alias_block "$configured_key"
-    ensure_remote
-    echo "Done — personal SSH set up for the dotfiles repo at $repo."
+    if ensure_remote; then
+      echo "Done — personal SSH set up for the dotfiles repo at $repo."
+    else
+      echo "Personal SSH set up for the dotfiles repo at $repo — but origin still needs"
+      echo "to point at the '$alias_host' alias (see the note above) before you can push."
+    fi
     exit 0
   fi
   echo "WARNING: recorded personal SSH key '$configured_key' no longer exists; running full setup." >&2
@@ -326,6 +337,10 @@ git -C "$repo" config hooks.sshHostAlias "$alias_host"
 
 install_hooks
 ensure_alias_block "$selected_key"
-ensure_remote
-
-echo "Personal SSH identity configured for the dotfiles repo at $repo."
+if ensure_remote; then
+  echo "Personal SSH identity configured for the dotfiles repo at $repo."
+else
+  echo "Personal SSH identity configured for the dotfiles repo at $repo — but origin"
+  echo "still needs to point at the '$alias_host' alias (see the note above) before you"
+  echo "can push."
+fi
