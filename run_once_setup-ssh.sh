@@ -40,9 +40,9 @@ ssh_config="$ssh_dir/config"
 # Existence is checked with `ssh -G` rather than grep so a block defined via an
 # Include also counts. If the alias exists but resolves to a different key or
 # hostname, warn and leave it alone — we never rewrite pre-existing ssh config.
-# Returns 0 when the alias resolves to github.com with the given key (or was just
-# added), 1 when an existing block was left in place that the pre-push hook will
-# block on until it is fixed by hand.
+# Returns 0 when the alias resolves to github.com with exactly the given key,
+# 1 when the ssh config still needs a fix by hand that the pre-push hook will
+# block on until it is done.
 ensure_alias_block() {
   local key="$1" resolved_hostname resolved_keys key_display
   resolved_hostname="$(ssh -G "$alias_host" 2>/dev/null | awk '/^hostname /{print $2}')"
@@ -88,6 +88,21 @@ ensure_alias_block() {
     echo "  IdentitiesOnly yes"
   } >>"$ssh_config"
   echo "Added 'Host $alias_host' to $ssh_config (IdentityFile $key_display)."
+
+  # Re-check now that the block is in place: IdentityFile accumulates across all
+  # matching blocks, so e.g. a 'Host *' that also sets one leaks an extra key —
+  # a state the pre-push hook blocks on, which the success message must not
+  # paper over.
+  resolved_keys="$(ssh -G "$alias_host" 2>/dev/null | sed -n 's/^identityfile //p' | sed "s|^~|$HOME|")"
+  if [ "$resolved_keys" != "$key" ]; then
+    echo "WARNING: another block in your ssh config (e.g. 'Host *') also sets IdentityFile," >&2
+    echo "  so 'Host $alias_host' resolves to:" >&2
+    printf '%s\n' "$resolved_keys" | sed 's/^/    /' >&2
+    echo "  instead of just the selected key: $key" >&2
+    echo "  Remove IdentityFile from that block so only this alias' key is offered;" >&2
+    echo "  pushes are blocked until then." >&2
+    return 1
+  fi
 }
 
 # Point origin at the alias so pushes can only ever offer the personal key.
