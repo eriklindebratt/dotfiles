@@ -168,11 +168,14 @@ if [ "$actual_name" != "$expected_name" ] || [ "$actual_email" != "$expected_ema
   echo "BLOCKED: dotfiles repo push identity ($actual_name <$actual_email>) != expected ($expected_name <$expected_email>)" >&2
   exit 1
 fi
-remote="$(git config remote.origin.url)"
+# git hands pre-push the real destination ($1 = remote name or URL, $2 = URL),
+# which also covers pushurl and pushes to remotes other than origin —
+# remote.origin.url would miss both.
+remote="$2"
 # Enforce SSH so pushes use the key/identity above, not a cached HTTPS credential.
 case "$remote" in
   git@* | ssh://*) ;;
-  *) echo "BLOCKED: origin is not an SSH URL ($remote)" >&2; exit 1 ;;
+  *) echo "BLOCKED: push destination is not an SSH URL ($remote)" >&2; exit 1 ;;
 esac
 key="$(git config hooks.sshKey)"
 key="${key/#\~/$HOME}"
@@ -180,8 +183,8 @@ if [ -n "$key" ] && [ ! -f "$key" ]; then
   echo "BLOCKED: SSH key recorded for this repo not found: $key" >&2
   exit 1
 fi
-# When an alias is recorded: require origin to use it, require the alias to
-# resolve (a deleted ssh config block otherwise surfaces as a cryptic DNS
+# When an alias is recorded: require the push destination to use it, require the
+# alias to resolve (a deleted ssh config block otherwise surfaces as a cryptic DNS
 # error), and require it to resolve to exactly the recorded key — a second
 # candidate key would reintroduce the wrong-account ambiguity this setup
 # exists to prevent. `ssh -G` only parses local config; no network involved.
@@ -190,8 +193,8 @@ if [ -n "$alias_host" ]; then
   case "$remote" in
     git@"$alias_host":* | ssh://git@"$alias_host"/*) ;;
     *)
-      echo "BLOCKED: origin must use the '$alias_host' alias (got: $remote)" >&2
-      echo "Fix: git remote set-url origin git@$alias_host:<owner>/<repo>.git" >&2
+      echo "BLOCKED: pushes must use the '$alias_host' alias (got: $remote)" >&2
+      echo "Fix: git remote set-url $1 git@$alias_host:<owner>/<repo>.git" >&2
       exit 1
       ;;
   esac
