@@ -27,7 +27,7 @@ HTTPS is used so this works on a fresh machine before SSH is set up. On apply, c
 - install the mise-managed runtimes from `~/.tool-versions` (prompted);
 - optionally apply macOS defaults from `.macos` (prompted);
 - prompt for your global Git identity (stored in `~/.gitconfig.local`);
-- optionally set up a personal SSH key/identity for this repo (prompted).
+- optionally set up a personal SSH key/identity + `github-personal` ssh alias for this repo (prompted).
 
 Each prompted step is skipped automatically when run without a TTY (CI, piped).
 
@@ -55,10 +55,25 @@ re-prompted if that file goes missing); `~/.gitconfig` includes it. Because `~/.
 is not managed by chezmoi, later edits stick and aren't reverted by `chezmoi apply`.
 
 `run_once_setup-ssh.sh` optionally configures a **personal** SSH key + identity for *this dotfiles
-repo only* (written to the repo's `.git/config`) and installs `pre-commit` / `pre-push` hooks that
-block commits/pushes made under the wrong identity. It does **not** rewrite the remote: if origin
-isn't already an SSH URL it prints the `git remote set-url` command to switch it, and the
-`pre-push` hook blocks pushes until you do.
+repo only*. It writes the identity and key choice to the repo's `.git/config`, ensures a
+`Host github-personal` alias block in `~/.ssh/config` (so only the personal key is ever offered to
+GitHub — even on machines whose `Host github.com` entry carries another identity), rewrites a
+github.com origin (HTTPS or SSH) to `git@github-personal:<owner>/<repo>.git`, and installs
+`pre-commit` / `pre-push` hooks that block commits/pushes made under the wrong identity, via a
+non-alias remote, or via an alias that no longer resolves to github.com with the recorded key. A
+pre-existing `Host github-personal` block pointing at a different key is never modified — the
+script warns and the `pre-push` hook blocks pushes until you point its `IdentityFile` at the
+selected key.
+
+When the repo is already set up (`hooks.sshKey` set and the key exists), re-runs — after this
+script's contents change, or a manual invocation — offer to set it up again instead of running
+full setup: make sure commits/pushes use your personal Git identity, and route origin through the
+`github-personal` alias (rewriting origin and editing `~/.ssh/config`). It does this only after an
+interactive y/N; with no controlling terminal (CI, piped, cron) it does nothing and leaves
+everything untouched — nothing is modified without a confirmation. It is also **not** drift
+recovery: chezmoi only re-runs a `run_once_` script when its *contents* change, so deleting the
+alias block or `.git/hooks` won't trigger it on its own — the `pre-push` hook blocks until you
+re-run the script.
 
 > **Manual-clone caveat:** git never runs hooks from a freshly cloned repo, and `.git/hooks` is
 > not part of a clone — so the identity-guard hooks exist only after `setup-ssh` runs during an
