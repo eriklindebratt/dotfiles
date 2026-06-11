@@ -77,8 +77,8 @@ ensure_alias_block() {
     touch "$ssh_config"
     chmod 600 "$ssh_config"
   fi
-  # Append, never prepend — e.g. OrbStack's Include must stay at the top of the file.
-  key_display="${key/#$HOME/\~}"
+  # Append, never prepend — e.g. some `Include` statements must stay at the top of the file.
+  key_display="${key/#$HOME/~}"
   {
     echo ""
     echo "# Personal GitHub identity for the dotfiles repo — added by setup-ssh (chezmoi)"
@@ -258,7 +258,7 @@ if [ -n "$configured_key" ]; then
       [yY][eE][sS] | [yY]) ;;
       *) echo "Left everything untouched."; exit 0 ;;
     esac
-    git -C "$repo" config core.sshCommand "ssh -i \"$configured_key\" -o IdentitiesOnly=yes"
+    git -C "$repo" config core.sshCommand "ssh -i $(printf '%q' "$configured_key") -o IdentitiesOnly=yes"
     git -C "$repo" config hooks.sshHostAlias "$alias_host"
     install_hooks
     ok=true
@@ -351,7 +351,7 @@ git -C "$repo" config user.name "$personal_git_name"
 git -C "$repo" config user.email "$personal_git_email"
 # Kept alongside the alias as a second layer: even if the remote is somehow
 # changed to plain github.com, the personal key is at least in the offered set.
-git -C "$repo" config core.sshCommand "ssh -i \"$selected_key\" -o IdentitiesOnly=yes"
+git -C "$repo" config core.sshCommand "ssh -i $(printf '%q' "$selected_key") -o IdentitiesOnly=yes"
 
 # Store the expected identity in the repo's git config for the guard hooks.
 git -C "$repo" config hooks.expectedName "$personal_git_name"
