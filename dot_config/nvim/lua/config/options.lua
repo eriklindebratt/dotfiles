@@ -27,3 +27,7 @@ vim.g.snacks_animate = false
 
 -- Require a Prettier config file for the Prettier formatter to be used
 vim.g.lazyvim_prettier_needs_config = false
+
+-- TypeScript LSP server. Set explicitly so a future LazyVim default change to
+-- tsgo doesn't take effect silently (tsgo currently lacks "Move to file" and other actions).
+vim.g.lazyvim_ts_lsp = "vtsls"

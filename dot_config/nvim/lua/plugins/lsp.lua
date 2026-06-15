@@ -35,7 +35,6 @@ end
 return {
   {
     "neovim/nvim-lspconfig",
-    commit = "8055131", -- https://github.com/neovim/nvim-lspconfig/issues/4216
     opts = function(_, opts)
       -- A server's `setup` handler is a single slot (LazyVim's lsp/init.lua does
       -- `opts.setup[server] or opts.setup["*"]`), so overriding `setup.vtsls`
@@ -77,64 +76,75 @@ return {
         },
         setup = {
           vtsls = function(server, sopts)
-            if not (vim.lsp.config.denols and vim.lsp.config.vtsls) then
-              return
-            end
-
-            -- Capture the *stock* root resolution for both servers before the
-            -- extra wraps them, so our override delegates to the real defaults
-            -- rather than the extra's deno.json-marker wrapper.
-            local stock = {}
-            for _, name in ipairs({ "denols", "vtsls" }) do
-              stock[name] = {
-                markers = vim.lsp.config[name].root_markers,
-                root_dir = vim.lsp.config[name].root_dir,
-              }
-            end
-
             -- Run the extra's setup for its side effects: the
             -- `_typescript.moveToFileRefactoring` command handler ("Move to file"
-            -- code action) and the TypeScript -> JavaScript settings copy. It
-            -- also installs its own deno.json-marker root split, which we
-            -- overwrite below.
+            -- code action) and the TypeScript -> JavaScript settings copy.
             if lazyvim_vtsls_setup then
               lazyvim_vtsls_setup(server, sopts)
             end
 
-            -- Override root resolution with our neoconf `deno.enablePaths` aware
-            -- version (handles deno files inside an npm monorepo without their
-            -- own deno.json, and gates which server attaches).
-            ---@param name string
-            local resolve = function(name)
-              local markers, root_dir = stock[name].markers, stock[name].root_dir
-              vim.lsp.config(name, {
-                root_dir = function(bufnr, on_dir)
-                  local is_deno = is_deno_enabled_file(vim.api.nvim_buf_get_name(bufnr))
-
-                  if name == "denols" then
-                    if not is_deno then
-                      return nil
-                    end
-                    if root_dir then
-                      return root_dir(bufnr, on_dir)
-                    elseif type(markers) == "table" then
-                      local root = vim.fs.root(bufnr, markers)
-                      return root and on_dir(root)
-                    end
-                  end
-
-                  if name == "vtsls" then
-                    if is_deno then
-                      return nil
-                    end
-                    local root = vim.fs.root(bufnr, { "package.json", "tsconfig.json", ".git" })
-                    return root and on_dir(root)
-                  end
-                end,
-              })
+            if not (vim.lsp.config.denols and vim.lsp.config.vtsls) then
+              return
             end
-            resolve("denols")
-            resolve("vtsls")
+
+            -- denols is NOT passive for files outside enablePaths — it actively
+            -- produces errors. root_dir must gate per-file to keep it and vtsls
+            -- mutually exclusive.
+            vim.lsp.config("denols", {
+              root_dir = function(bufnr, on_dir)
+                local file_path = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ":p")
+                local enable_paths = get_abs_deno_enable_paths()
+
+                if #enable_paths > 0 then
+                  -- enablePaths is sole truth: only attach to files in those paths.
+                  -- Fall back to cwd since the user has explicitly opted in.
+                  for _, path in ipairs(enable_paths) do
+                    if vim.startswith(file_path, path) then
+                      local root = vim.fs.root(bufnr, { "deno.json", "deno.jsonc", "deno.lock" })
+                        or vim.fs.root(bufnr, { ".git" })
+                        or vim.uv.cwd()
+                      return on_dir(root)
+                    end
+                  end
+                  return nil
+                end
+
+                if require("neoconf").get("vscode.deno.enable") then
+                  local root = vim.fs.root(bufnr, { "deno.json", "deno.jsonc", "deno.lock" })
+                    or vim.fs.root(bufnr, { ".git" })
+                    or vim.uv.cwd()
+                  return on_dir(root)
+                end
+
+                -- No explicit config: require a deno config file, no cwd fallback.
+                local root = vim.fs.root(bufnr, { "deno.json", "deno.jsonc", "deno.lock" })
+                return root and on_dir(root)
+              end,
+            })
+
+            -- vtsls is the critical gate: skip any file that denols should own.
+            -- Priority: enablePaths (sole truth when set) → deno.enable → deno config file.
+            vim.lsp.config("vtsls", {
+              root_dir = function(bufnr, on_dir)
+                local file_path = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ":p")
+                local enable_paths = get_abs_deno_enable_paths()
+
+                if #enable_paths > 0 then
+                  for _, path in ipairs(enable_paths) do
+                    if vim.startswith(file_path, path) then
+                      return nil
+                    end
+                  end
+                elseif require("neoconf").get("vscode.deno.enable") then
+                  return nil
+                elseif vim.fs.root(bufnr, { "deno.json", "deno.jsonc", "deno.lock" }) then
+                  return nil
+                end
+
+                local root = vim.fs.root(bufnr, { "package.json", "tsconfig.json", ".git" })
+                return root and on_dir(root)
+              end,
+            })
           end,
         },
       })
