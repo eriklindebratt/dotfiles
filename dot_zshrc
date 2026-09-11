@@ -297,6 +297,55 @@ wt() {
   fi
 }
 
+eyes-on-pr() {
+  local repo_slug pr_number pr_title pr_url selected confirm
+  local need_confirm=1
+  local bold=$'\033[1m'
+  local dim=$'\033[2m'
+  local italic=$'\033[3m'
+  local underline=$'\033[4m'
+  local cyan=$'\033[36m'
+  local green=$'\033[32m'
+  local reset=$'\033[0m'
+
+  repo_slug=$(gh repo view --json nameWithOwner -q .nameWithOwner) || return 1
+
+  if [[ -n "$1" ]]; then
+    # A PR number was given as an argument - fetch its info before reacting to it.
+    selected=$(gh pr view "$1" --json number,title,url -q '"\(.number)\t\(.title)\t\(.url)"') || return 1
+    IFS=$'\t' read -r pr_number pr_title pr_url <<< "$selected"
+  elif selected=$(gh pr view --json number,title,url -q '"\(.number)\t\(.title)\t\(.url)"' 2>/dev/null); then
+    # Try to find a PR for the current branch.
+    IFS=$'\t' read -r pr_number pr_title pr_url <<< "$selected"
+  else
+    # No PR for this branch - let the user pick one with fzf.
+    selected=$(gh pr list --state open --json number,title,url -q '.[] | "\(.number)\t#\(.number) \(.title)\t\(.url)"' \
+      | fzf --delimiter=$'\t' --with-nth=2 --prompt='Select a PR: ')
+
+    if [[ -z "$selected" ]]; then
+      printf "%sNo PR selected.%s\n" "$dim" "$reset" >&2
+      return 1
+    fi
+
+    IFS=$'\t' read -r pr_number pr_title pr_url <<< "$selected"
+    need_confirm=0
+  fi
+
+  if [[ "$need_confirm" -eq 1 ]]; then
+    printf "${bold}PR:${reset} ${cyan}%s#%s${reset} - ${italic}%s${reset}\n" "$repo_slug" "$pr_number" "$pr_title"
+    printf '%s' "${bold}Let the author know you're looking at this? [Y/n] ${reset}"
+    read -r confirm
+    [[ "$confirm" =~ ^([Yy][Ee][Ss]|[Yy])?$ ]] || {
+      printf "%sCancelled.%s\n" "$dim" "$reset" >&2
+      return 1
+    }
+  fi
+
+  if gh api --method POST "repos/$repo_slug/issues/$pr_number/reactions" -f content=eyes >/dev/null; then
+    printf "${green}${bold}👀 added${reset} - ${underline}${cyan}%s${reset}\n" "$pr_url"
+  fi
+}
+
 # Treat `/` as a word boundary so Ctrl-W deletes back to the nearest `/` (path
 # component), matching Oh My Zsh's default. Zsh's built-in default includes `/`.
 WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
