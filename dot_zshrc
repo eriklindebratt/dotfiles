@@ -290,10 +290,10 @@ wt() {
     printf '%s' "${bold}Remove worktree at ${cyan}${display_path}${reset}${bold}? [Y/n] ${reset}"
     read -r confirm
     [[ "$confirm" =~ ^([Yy][Ee][Ss]|[Yy])?$ ]] || { printf "Aborted\n"; return 0; }
-    git worktree remove "$worktree_path" || return
+    git worktree remove --force "$worktree_path" || return
     printf '%s' "${bold}Also delete branch ${cyan}${branch}${reset}${bold}? [Y/n] ${reset}"
     read -r confirm
-    [[ "$confirm" =~ ^([Yy][Ee][Ss]|[Yy])?$ ]] && git branch -d "$branch"
+    [[ "$confirm" =~ ^([Yy][Ee][Ss]|[Yy])?$ ]] && git branch -D "$branch"
   fi
 }
 
